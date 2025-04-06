@@ -1,4 +1,5 @@
 package model;
+import java.util.Date;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
@@ -12,15 +13,19 @@ public class User {
     private String address;
     private String phone;
     private String role;
-    private byte pfp;
-
-    //additional attribute for doctor
+    private byte[] pfp;
     private String gender;
+    private Date dateOfBirth;
+
+    //additional attribute for doctor user
+    private String degree;
     private String specialization;
     private Float fee;
+    private Boolean isAvailable;
+
 
     //Constructor
-    public User(UUID id, String firstName, String lastName, String email, String passwordHash, String address, String phone, String role, byte pfp, String gender, String specialization, Float fee) {
+    public User(UUID id, String firstName, String lastName, String email, String passwordHash, String address, String phone, String role, byte[] pfp, String gender, Date dateOfBirth, String degree, String specialization, Float fee, Boolean isAvailable) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -31,25 +36,15 @@ public class User {
         this.role = role;
         this.pfp = pfp;
         this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.degree = degree;
         this.specialization = specialization;
         this.fee = fee;
+        this.isAvailable = isAvailable;
     }
-    //Constructor Doctor
-//    public User(UUID id, String firstName, String lastName, String email, String passwordHash, String address, String phone, String role, byte pfp, String gender) {
-//        this.id = id;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.email = email;
-//        this.passwordHash = passwordHash;
-//        this.address = address;
-//        this.phone = phone;
-//        this.role = role;
-//        this.pfp = pfp;
-//        this.gender = gender;
-//    }
 
     //Constructor for user view without password
-    public User(UUID id, String firstName, String lastName, String email, String address, String phone, String role, byte pfp, String gender, String specialization, Float fee) {
+    public User(UUID id, String firstName, String lastName, String email, String address, String phone, String role, byte[] pfp, String gender, Date dateOfBirth, String degree, String specialization, Float fee, Boolean isAvailable) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -59,8 +54,11 @@ public class User {
         this.role = role;
         this.pfp = pfp;
         this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.degree = degree;
         this.specialization = specialization;
         this.fee = fee;
+        this.isAvailable = isAvailable;
     }
 
     // Getters Setters
@@ -132,11 +130,11 @@ public class User {
         this.role = role;
     }
 
-    public byte getPfp() {
+    public byte[] getPfp() {
         return pfp;
     }
 
-    public void setPfp(byte pfp) {
+    public void setPfp(byte[] pfp) {
         this.pfp = pfp;
     }
 
@@ -162,5 +160,33 @@ public class User {
 
     public void setFee(Float fee) {
         this.fee = fee;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public java.sql.Date getDateOfBirth() {
+        return (java.sql.Date) dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public Boolean getAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
     }
 }
