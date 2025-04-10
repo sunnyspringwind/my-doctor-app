@@ -24,6 +24,13 @@
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
       <version>2.0.0</version>
     </dependency>
+    <!--mysql driver -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version> <!-- Or latest stable -->
+    </dependency>
+
     <dependency>
       <groupId>org.glassfish.web</groupId>
       <artifactId>jakarta.servlet.jsp.jstl</artifactId>

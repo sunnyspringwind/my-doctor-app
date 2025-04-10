@@ -1,9 +1,12 @@
 package model;
+import java.sql.Blob;
 import java.util.Date;
 import java.util.UUID;
 
-@SuppressWarnings("unused")
-public class User {
+/**
+ * Base User class containing common attributes and behaviors
+ */
+public abstract class User {
     private UUID id;
     private String firstName;
     private String lastName;
@@ -13,19 +16,14 @@ public class User {
     private String address;
     private String phone;
     private String role;
-    private byte[] pfp;
+    private Blob pfp;  // Changed to java.sql.Blob for database compatibility
     private String gender;
     private Date dateOfBirth;
 
-    //additional attribute for doctor user
-    private String degree;
-    private String specialization;
-    private Float fee;
-    private Boolean isAvailable;
-
-
-    //Constructor
-    public User(UUID id, String firstName, String lastName, String email, String passwordHash, String address, String phone, String role, byte[] pfp, String gender, Date dateOfBirth, String degree, String specialization, Float fee, Boolean isAvailable) {
+    // Constructor with all common fields
+    public User(UUID id, String firstName, String lastName, String email,
+                String passwordHash, String address, String phone, String role,
+                Blob pfp, String gender, Date dateOfBirth) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -37,14 +35,12 @@ public class User {
         this.pfp = pfp;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
-        this.degree = degree;
-        this.specialization = specialization;
-        this.fee = fee;
-        this.isAvailable = isAvailable;
     }
 
-    //Constructor for user view without password
-    public User(UUID id, String firstName, String lastName, String email, String address, String phone, String role, byte[] pfp, String gender, Date dateOfBirth, String degree, String specialization, Float fee, Boolean isAvailable) {
+    // Constructor without password for view purposes
+    public User(UUID id, String firstName, String lastName, String email,
+                String address, String phone, String role, Blob pfp,
+                String gender, Date dateOfBirth) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -55,14 +51,9 @@ public class User {
         this.pfp = pfp;
         this.gender = gender;
         this.dateOfBirth = dateOfBirth;
-        this.degree = degree;
-        this.specialization = specialization;
-        this.fee = fee;
-        this.isAvailable = isAvailable;
     }
 
-    // Getters Setters
-
+    // Getters and Setters for common fields
     public UUID getId() {
         return id;
     }
@@ -94,8 +85,13 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPasswordHash() {
@@ -130,11 +126,11 @@ public class User {
         this.role = role;
     }
 
-    public byte[] getPfp() {
+    public Blob getPfp() {
         return pfp;
     }
 
-    public void setPfp(byte[] pfp) {
+    public void setPfp(Blob pfp) {
         this.pfp = pfp;
     }
 
@@ -146,47 +142,29 @@ public class User {
         this.gender = gender;
     }
 
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public Float getFee() {
-        return fee;
-    }
-
-    public void setFee(Float fee) {
-        this.fee = fee;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public java.sql.Date getDateOfBirth() {
-        return (java.sql.Date) dateOfBirth;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
     public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getDegree() {
-        return degree;
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", address='" + address + '\'' +
+                ", phone='" + phone + '\'' +
+                ", role='" + role + '\'' +
+                ", pfp=" + pfp +
+                ", gender='" + gender + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                '}';
     }
 
-    public void setDegree(String degree) {
-        this.degree = degree;
-    }
-
-    public Boolean getAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
-    }
 }

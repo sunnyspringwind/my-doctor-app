@@ -6,10 +6,10 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
-@WebServlet(name = "HomeServlet", value = "/home")
+@WebServlet(name = "HomeServlet", value = "/")
 public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendRedirect(request.getContextPath() + "/home");
+        request.getRequestDispatcher( "index.jsp");
     }
 }

@@ -16,7 +16,8 @@ public class EmailSender {
 
     // Static block to load configuration only once
     static {
-        try (InputStream input = new FileInputStream("src/main/java/resources/config.properties")) {
+        try (InputStream input = EmailSender.class.getClassLoader().getResourceAsStream("config.properties")) {
+
             // Load the config file
             Properties config = new Properties();
             config.load(input);
@@ -88,14 +89,15 @@ public class EmailSender {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        EmailSender emailSender = new EmailSender();
-        try {
-            int code = emailSender.sendValidationEmail("immortalwizzard@gmail.com");
-            System.out.println("Verification code: " + code);
-        } catch (Exception e) {
-            System.err.println("Failed to send email: " + e.getMessage());
-        }
-        System.out.println("Email sending process completed");
-    }
+//    public static void main(String[] args) throws IOException {
+//
+//        EmailSender emailSender = new EmailSender();
+//        try {
+//            int code = emailSender.sendValidationEmail("immortalwizzard@gmail.com");
+//            System.out.println("Verification code: " + code);
+//        } catch (Exception e) {
+//            System.err.println("Failed to send email: " + e.getMessage());
+//        }
+//        System.out.println("Email sending process completed");
+//    }
 }
