@@ -8,7 +8,7 @@ import model.Patient;
 import model.User;
 import dao.UserDAO;
 import org.mindrot.jbcrypt.BCrypt;
-import utils.UserStatus;
+import utils.StatusCode;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -132,17 +132,17 @@ request.getRequestDispatcher(registerPage).forward(request, response);          
            System.out.println("user is null");
             return;
         }
-        UserStatus status = userDAO.addUser(user);
+        StatusCode status = userDAO.addUser(user);
 
         // Set appropriate response based on the operation status
         response.setContentType("text/plain");
-        if (status == UserStatus.SUCCESS) {
+        if (status == StatusCode.SUCCESS) {
             response.sendRedirect("/login");
-        } else if (status == UserStatus.EMAIL_ALREADY_EXISTS) {
+        } else if (status == StatusCode.EMAIL_ALREADY_EXISTS) {
             request.setAttribute("error", "Email already exists.");
             request.getRequestDispatcher("/WEB-INF/view/register.jsp").forward(request, response);
 
-        } else if (status == UserStatus.PHONE_ALREADY_EXISTS) {
+        } else if (status == StatusCode.PHONE_ALREADY_EXISTS) {
             request.setAttribute("error", "Phone number already exists.");
             request.getRequestDispatcher("/WEB-INF/view/register.jsp").forward(request, response);
 

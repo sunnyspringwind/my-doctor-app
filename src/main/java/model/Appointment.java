@@ -1,11 +1,8 @@
 package model;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 public class Appointment {
-    //Attributes: appointmentId(PK), doctorId(FK to Doctor), userId(FK to User), appointmentTime, appointmentTime, status, payment, reason
     private int appointmentId;
     private String doctorId;
     private String patientId;
@@ -14,7 +11,7 @@ public class Appointment {
     private String reason;
     private float payment;
 
-    //default constructor and custom ones
+    // Default constructor and custom ones
     public Appointment() {}
 
     public Appointment(int appointmentId, String doctorId, String patientId, Timestamp appointmentTime, String status, String reason, float payment) {
@@ -27,7 +24,7 @@ public class Appointment {
         this.payment = payment;
     }
 
-    public Appointment( String doctorId, String patientId, Timestamp appointmentTime, String status, String reason, float payment) {
+    public Appointment(String doctorId, String patientId, Timestamp appointmentTime, String status, String reason, float payment) {
         this.doctorId = doctorId;
         this.patientId = patientId;
         this.appointmentTime = appointmentTime;
@@ -36,6 +33,7 @@ public class Appointment {
         this.payment = payment;
     }
 
+    // Getters and setters
     public int getAppointmentId() {
         return appointmentId;
     }

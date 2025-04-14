@@ -1,17 +1,13 @@
 package utils;
 
-import dao.UserDAO;
-import model.Doctor;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DBConnectionUtil {
+public class DBUtil {
     // Database credentials
     private static String url;
     private static String username;
@@ -19,7 +15,7 @@ public class DBConnectionUtil {
 
     //import db credentials form env file and load driver
     static {
-        try (InputStream input = DBConnectionUtil.class.getClassLoader().getResourceAsStream("db.properties")) {
+        try (InputStream input = DBUtil.class.getClassLoader().getResourceAsStream("db.properties")) {
             // Load the config file
             Properties config = new Properties();
             if (input != null) {

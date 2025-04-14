@@ -5,8 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 import model.User;
-import service.EmailSender;
-import utils.UserAuthentication;
+import utils.EmailSender;
 
 import java.io.IOException;
 

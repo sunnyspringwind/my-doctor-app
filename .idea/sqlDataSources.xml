@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DdlMappings">
     <mapping uuid="c6dae96b-0bea-487d-a7c0-9dac2c07bda0" name="myDoctorApp@localhost Mapping">
-      <data-sources db="598ed427-eb84-4ab1-bb42-80b445b41382" ddl="6fe5ffbc-1b2e-4496-9138-2300822e2a2b" />
+      <data-sources db="598ed427-eb84-4ab1-bb42-80b445b41382" ddl="da790f89-2d23-4087-9f3e-678366175b3d" />
       <scope>
         <node kind="database" negative="1" />
       </scope>
@@ -17,7 +17,7 @@
           <option name="dbmsName" value="MARIADB" />
           <option name="urls">
             <array>
-              <option value="file://$PROJECT_DIR$/src/main/resources/schema.sql" />
+              <option value="file://$PROJECT_DIR$/src/main/resources/schema2.sql" />
             </array>
           </option>
           <option name="outLayout" value="File per object by schema.groovy" />

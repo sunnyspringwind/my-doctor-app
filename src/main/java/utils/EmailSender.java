@@ -1,34 +1,28 @@
-package service;
+package utils;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.SecureRandom;
+import java.util.*;
 
-/** EmailSender for email verification, password resets or email changes */
 public class EmailSender {
 
     private static String username = "";
     private static String password = "";
     private static final Properties props = new Properties();
 
-    // Static block to load configuration only once
     static {
         try (InputStream input = EmailSender.class.getClassLoader().getResourceAsStream("config.properties")) {
-
-            // Load the config file
             Properties config = new Properties();
             config.load(input);
 
-            // Get credentials and server settings
             username = config.getProperty("email.username");
             password = config.getProperty("email.password");
             String host = config.getProperty("smtp.host");
             String port = config.getProperty("smtp.port");
 
-            // Configure mail session properties
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.host", host);
@@ -41,12 +35,11 @@ public class EmailSender {
     }
 
     public static Session getSession() {
-        return Session.getInstance(props,
-                new javax.mail.Authenticator() {
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(username, password);
-                    }
-                });
+        return Session.getInstance(props, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
     }
 
     public int passwordResetMail(String email) {
@@ -65,11 +58,10 @@ public class EmailSender {
 
     private int sendEmail(String email, String subject, String bodyTemplate) {
         try {
-            int code = new Random().nextInt(900000) + 100000; // Generate 6-digit random code
+            SecureRandom random = new SecureRandom();
+            int code = 100000 + random.nextInt(900000); // Secure random 6-digit code
 
             Session session = getSession();
-            System.out.println("Debug: Session Properties - " + session.getProperties());
-
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
@@ -82,22 +74,33 @@ public class EmailSender {
             return code;
         } catch (MessagingException e) {
             System.err.println("Email error: " + e.getMessage());
-            if (e.getCause() != null) {
-                System.err.println("Caused by: " + e.getCause().getMessage());
-            }
-            throw new RuntimeException("Failed to send " + subject.toLowerCase() + " email.", e);
+            return -1; // Return error code
         }
     }
 
-//    public static void main(String[] args) throws IOException {
-//
+    // Main method to test out the email functionality
+//    public static void main(String[] args) {
 //        EmailSender emailSender = new EmailSender();
+//
+//        // Test sending validation email
 //        try {
-//            int code = emailSender.sendValidationEmail("immortalwizzard@gmail.com");
-//            System.out.println("Verification code: " + code);
+//            String testEmail = "immortalwizzard@.com"; // Replace with a valid email address for testing
+//            int code = emailSender.sendValidationEmail(testEmail);
+//            System.out.println("Verification code sent: " + code);
 //        } catch (Exception e) {
-//            System.err.println("Failed to send email: " + e.getMessage());
+//            System.err.println("Failed to send validation email: " + e.getMessage());
 //        }
+//
+//        // Test sending password reset email
+//        try {
+//            String testEmail = "immortalwizzard@.com"; // Replace with a valid email address for testing
+//            int code = emailSender.passwordResetMail(testEmail);
+//            System.out.println("Password reset code sent: " + code);
+//        } catch (Exception e) {
+//            System.err.println("Failed to send password reset email: " + e.getMessage());
+//        }
+//
 //        System.out.println("Email sending process completed");
 //    }
+
 }
