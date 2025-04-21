@@ -1,5 +1,7 @@
 package model;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Blob;
 import java.util.UUID;
 
@@ -13,15 +15,14 @@ public class Doctor {
     private float fees;
     private String degree;
     private boolean isAvailable;
-    private String imageUrl;
-    private Blob pfp;  // Profile picture (binary large object)
+    private byte[] pfp;
 
-    // Default constructor
+    //Default constructor
     public Doctor() {}
 
     // Parameterized constructor
     public Doctor(UUID doctorId, String name, String email, String passwordHash, String speciality,
-                  int experience, float fees, String degree, boolean isAvailable, String imageUrl, Blob pfp) {
+                  int experience, float fees, String degree, boolean isAvailable, byte[] pfp) {
         this.doctorId = doctorId;
         this.name = name;
         this.email = email;
@@ -31,8 +32,28 @@ public class Doctor {
         this.fees = fees;
         this.degree = degree;
         this.isAvailable = isAvailable;
-        this.imageUrl = imageUrl;
         this.pfp = pfp;
+    }
+
+    // 🔐 1. Factory method for registration (add UUID, hashes the plain password)
+    public static Doctor createFromRegistration(String name, String email, String plainPassword, String speciality,
+                                                int experience, float fees, String degree, boolean isAvailable, byte[] pfp) {
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+        return new Doctor(UUID.randomUUID(), name, email, hashedPassword, speciality,
+                experience, fees, degree, isAvailable, pfp);
+    }
+
+    public static Doctor createFromRegistration(String name, String email, String plainPassword) {
+        return createFromRegistration(name, email, plainPassword, null, 0, 0, null, true, null);
+    }
+
+
+    // 🗂️ 2. Factory method for loading from the database (uses pre-hashed password)
+    public static Doctor createFromDatabase(UUID doctorId, String name, String email, String passwordHash,
+                                            String speciality, int experience, float fees, String degree,
+                                            boolean isAvailable, byte[] pfp) {
+        return new Doctor(doctorId, name, email, passwordHash, speciality,
+                experience, fees, degree, isAvailable, pfp);
     }
 
     // Getters and Setters
@@ -75,7 +96,6 @@ public class Doctor {
     public void setSpeciality(String speciality) {
         this.speciality = speciality;
     }
-
     public int getExperience() {
         return experience;
     }
@@ -108,19 +128,28 @@ public class Doctor {
         isAvailable = available;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Blob getPfp() {
+    public byte[] getPfp() {
         return pfp;
     }
 
-    public void setPfp(Blob pfp) {
+    public void setPfp(byte[] pfp) {
         this.pfp = pfp;
     }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "doctorId=" + doctorId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", speciality='" + speciality + '\'' +
+                ", experience=" + experience +
+                ", available=" + isAvailable +
+                ", fees=" + fees +
+                ", degree='" + degree + '\'' +
+                ", pfp=" + (pfp != null ? "present" : "null") +
+                '}';
+    }
+
+
 }

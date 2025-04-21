@@ -14,4 +14,5 @@ public interface IPatientDAO {
     boolean updatePatientPassword(String patientId, String oldPassword, String newPassword);
     boolean deletePatient(String patientId);
     Patient loginPatient(String email, String password);
+    Patient getPatientByPhone(String phone);
 }

@@ -1,3 +1,6 @@
+CREATE DATABASE myDoctorDb;
+
+USE myDoctorDb;
 -- Patient Table
 CREATE TABLE Patient (
                          patientId CHAR(36) PRIMARY KEY,
@@ -35,7 +38,6 @@ CREATE TABLE Doctor (
                         fees FLOAT,
                         degree VARCHAR(100),
                         isAvailable BOOLEAN DEFAULT TRUE,
-                        imageUrl VARCHAR(255),
                         pfp LONGBLOB  -- Profile Picture stored as a Blob (binary large object)
 );
 

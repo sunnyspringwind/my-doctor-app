@@ -34,17 +34,13 @@ public class PatientDAO implements IPatientDAO {
             return StatusCode.INTERNAL_SERVER_ERROR;
         }
 
-        // Generate UUID for userId
-        UUID userId = UUID.randomUUID();
-        patient.setPatientId(userId); // Set the UUID for the patient
-
         String sql = "INSERT INTO patient (patientId, name, email, password, phone, address, gender, dateOfBirth) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, userId.toString());  // Use UUID as string
+            stmt.setString(1, String.valueOf(patient.getPatientId()));  // Use UUID as string
             stmt.setString(2, patient.getName());
             stmt.setString(3, patient.getEmail());
             stmt.setString(4, patient.getPasswordHash());
@@ -100,6 +96,21 @@ public class PatientDAO implements IPatientDAO {
     }
 
     @Override
+    public Patient getPatientByPhone(String phone) {
+        String sql = "SELECT * FROM Patient WHERE phone = ?";
+        try(Connection conn = DBUtil.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return createPatientFromResultSet(rs);
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public List<Patient> getAllPatients() {
         List<Patient> patients = new ArrayList<>();
         String sql = "SELECT * FROM Patient";
@@ -118,7 +129,7 @@ public class PatientDAO implements IPatientDAO {
 
     @Override
     public boolean updatePatient(Patient patient) {
-        String sql = "UPDATE Patient SET name=?, email=?, phone=?, address=?, gender=?, dateOfBirth=? " +
+        String sql = "UPDATE Patient SET name=?, email=?, phone=?, address=?, gender=?, dateOfBirth=?, isActive=?, registrationDate=?, pfp=? " +
                 "WHERE patientId=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -129,7 +140,10 @@ public class PatientDAO implements IPatientDAO {
             stmt.setString(4, patient.getAddress());
             stmt.setString(5, patient.getGender());
             stmt.setDate(6, patient.getDateOfBirth());
-            stmt.setString(7, patient.getPatientId().toString());
+            stmt.setBoolean(7, patient.isActive());
+            stmt.setDate(8, patient.getRegistrationDate());
+            stmt.setBytes(9, patient.getPfp());
+            stmt.setString(10, patient.getPatientId().toString());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;

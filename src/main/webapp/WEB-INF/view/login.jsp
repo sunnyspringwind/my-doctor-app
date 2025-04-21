@@ -1,195 +1,160 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Healthcare System</title>
+    <title>Login | MyDoctor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7fa;
-            margin: 0;
-            padding: 20px;
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        .container {
-            max-width: 500px;
-            margin: 80px auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+        .login-container {
+            background: #fff;
+            padding: 2rem 3rem;
+            border-radius: 10px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+            width: 400px;
         }
-        h1 {
+
+        h2 {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
+            color: #333;
         }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
         }
+
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+
+        input, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 16px;
+            padding: 0.6rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
         }
-        .btn-submit {
-            background-color: #3498db;
+
+        .remember-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .remember-container input {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-weight: bold;
             cursor: pointer;
-            display: block;
-            width: 100%;
-            font-weight: 600;
         }
-        .btn-submit:hover {
-            background-color: #2980b9;
+
+        button:hover {
+            background-color: #0056b3;
         }
+
         .error-message {
-            color: #e74c3c;
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #fadbd8;
-            border-radius: 4px;
-            display: none;
-        }
-        .switch-register {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            margin-bottom: 1rem;
             text-align: center;
-            margin-top: 20px;
         }
-        .switch-register a {
-            color: #3498db;
+
+        .register-link {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .register-link a {
+            color: #007bff;
             text-decoration: none;
         }
-        .switch-register a:hover {
+
+        .register-link a:hover {
             text-decoration: underline;
-        }
-        .forgot-password {
-            text-align: right;
-            margin-top: 5px;
-        }
-        .forgot-password a {
-            color: #7f8c8d;
-            text-decoration: none;
-            font-size: 14px;
-        }
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-        .logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .logo img {
-            max-width: 150px;
-            height: auto;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">
-        <!-- Replace with your logo -->
-        <h2>Healthcare System</h2>
-    </div>
+<div class="login-container">
+    <h2>Login</h2>
 
-    <h1>Log In</h1>
+    <!-- Display error message if any -->
+    <c:if test="${not empty error}">
+        <div class="error-message">${error}</div>
+    </c:if>
 
-    <% if(request.getAttribute("error") != null) { %>
-    <div class="error-message" style="display: block;">
-        <%= request.getAttribute("error") %>
-    </div>
-    <% } %>
-
-    <form action="<%=request.getContextPath()%>/login" method="post" id="loginForm">
+    <form name="loginForm" action="<c:url value='/login' />" method="POST" onsubmit="return validateForm()">
         <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
         </div>
 
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-            <div class="forgot-password">
-                <a href="<%=request.getContextPath()%>/reset-password">Forgot Password?</a>
-            </div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
         </div>
 
-        <button type="submit" class="btn-submit">Login</button>
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="">Select a role</option>
+                <option value="doctor">Doctor</option>
+                <option value="patient">Patient</option>
+            </select>
+        </div>
 
-        <div class="switch-register">
-            Don't have an account? <a href="<%=request.getContextPath()%>/register">Register here</a>
+        <div class="remember-container">
+            <input type="checkbox" id="remember" name="remember">
+            <label for="remember">Remember Me</label>
+        </div>
+
+        <div class="form-group">
+            <button type="submit">Login</button>
         </div>
     </form>
+
+    <div class="register-link">
+        <p>Don't have an account? <a href="<c:url value='/register' />">Register here</a></p>
+    </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-        var email = document.getElementById('email').value;
-        var password = document.getElementById('password').value;
+    function validateForm() {
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const role = document.getElementById("role").value;
 
-        // Basic validation
-        if (!email || !password) {
-            event.preventDefault();
-            var errorDiv = document.querySelector('.error-message');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                this.insertBefore(errorDiv, this.firstChild);
-            }
-            errorDiv.textContent = "Please enter both email and password";
-            errorDiv.style.display = "block";
-            return false;
-        }
-
-        // Email validation
-        var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) {
-            event.preventDefault();
-            var errorDiv = document.querySelector('.error-message');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                this.insertBefore(errorDiv, this.firstChild);
-            }
-            errorDiv.textContent = "Please enter a valid email address";
-            errorDiv.style.display = "block";
+        if (!email || !password || !role) {
+            alert("All fields are required.");
             return false;
         }
 
         return true;
-    });
-
-    // Show error message if there's an error parameter in the URL
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const errorMsg = urlParams.get('error');
-
-        if (errorMsg) {
-            var errorDiv = document.querySelector('.error-message');
-            if (!errorDiv) {
-                errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                document.getElementById('loginForm').insertBefore(errorDiv, document.getElementById('loginForm').firstChild);
-            }
-            errorDiv.textContent = decodeURIComponent(errorMsg);
-            errorDiv.style.display = "block";
-        }
-    };
+    }
 </script>
 </body>
 </html>

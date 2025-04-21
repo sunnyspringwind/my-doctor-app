@@ -24,5 +24,4 @@ public interface IDoctorDAO {
 
     boolean deleteDoctor(UUID doctorId);
 
-    Doctor loginDoctor(String email, String password);
 }

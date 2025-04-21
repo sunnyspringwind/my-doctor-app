@@ -27,35 +27,35 @@ public class DoctorDAO implements IDoctorDAO {
             return StatusCode.INTERNAL_SERVER_ERROR;
         }
 
-        String sql = "INSERT INTO Doctor (name, email, password, speciality, experience, fees, degree, " +
-                "isAvailable, imageUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Doctor (doctorId, name, email, password, speciality, experience, fees, degree, " +
+                "isAvailable, pfp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, doctor.getName());
-            stmt.setString(2, doctor.getEmail());
-            stmt.setString(3, doctor.getPasswordHash()); // Assuming the password is already hashed
-            stmt.setString(4, doctor.getSpeciality());
-            stmt.setInt(5, doctor.getExperience());
-            stmt.setFloat(6, doctor.getFees());
-            stmt.setString(7, doctor.getDegree());
-            stmt.setBoolean(8, doctor.isAvailable());
-            stmt.setString(9, doctor.getImageUrl());
+            // Make sure doctorId is already set (done in factory )
+            stmt.setString(1, doctor.getDoctorId().toString());
+            stmt.setString(2, doctor.getName());
+            stmt.setString(3, doctor.getEmail());
+            stmt.setString(4, doctor.getPasswordHash()); // Already hashed
+            stmt.setString(5, doctor.getSpeciality());
+            stmt.setInt(6, doctor.getExperience());
+            stmt.setFloat(7, doctor.getFees());
+            stmt.setString(8, doctor.getDegree());
+            stmt.setBoolean(9, doctor.isAvailable());
+            stmt.setBytes(10, doctor.getPfp());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
-                ResultSet generatedKeys = stmt.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    doctor.setDoctorId(UUID.randomUUID()); // Set UUID for the new doctor
-                }
                 return StatusCode.SUCCESS;
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return StatusCode.INTERNAL_SERVER_ERROR;
     }
+
 
     @Override
     public Doctor getDoctorById(UUID doctorId) {
@@ -132,7 +132,7 @@ public class DoctorDAO implements IDoctorDAO {
     @Override
     public boolean updateDoctor(Doctor doctor) {
         String sql = "UPDATE Doctor SET name=?, email=?, speciality=?, experience=?, " +
-                "fees=?, degree=?, isAvailable=?, imageUrl=? WHERE doctorId=?";
+                "fees=?, degree=?, isAvailable=?, pfp=? WHERE doctorId=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -143,7 +143,7 @@ public class DoctorDAO implements IDoctorDAO {
             stmt.setFloat(5, doctor.getFees());
             stmt.setString(6, doctor.getDegree());
             stmt.setBoolean(7, doctor.isAvailable());
-            stmt.setString(8, doctor.getImageUrl());
+            stmt.setBytes(8, doctor.getPfp());
             stmt.setString(9, doctor.getDoctorId().toString());
 
             int rowsAffected = stmt.executeUpdate();
@@ -198,27 +198,6 @@ public class DoctorDAO implements IDoctorDAO {
         return false;
     }
 
-    @Override
-    public Doctor loginDoctor(String email, String password) {
-        String sql = "SELECT * FROM Doctor WHERE email = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                String hashedPassword = rs.getString("password");
-                if (BCrypt.checkpw(password, hashedPassword)) {
-                    return createDoctorFromResultSet(rs);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     private Doctor createDoctorFromResultSet(ResultSet rs) throws SQLException {
         Doctor doctor = new Doctor();
         doctor.setDoctorId(UUID.fromString(rs.getString("doctorId"))); // Now UUID
@@ -230,7 +209,7 @@ public class DoctorDAO implements IDoctorDAO {
         doctor.setFees(rs.getFloat("fees"));
         doctor.setDegree(rs.getString("degree"));
         doctor.setAvailable(rs.getBoolean("isAvailable"));
-        doctor.setImageUrl(rs.getString("imageUrl"));
+        doctor.setPfp(rs.getBytes("pfp"));
         return doctor;
     }
 }

@@ -1,5 +1,7 @@
 package model;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Date;
 import java.sql.Blob;
 import java.util.UUID;
@@ -15,14 +17,14 @@ public class Patient {
     private Date dateOfBirth;
     private boolean isActive;
     private Date registrationDate;
-    private Blob pfp;  // Profile picture (binary large object)
+    private byte[] pfp;
 
     // Default constructor
     public Patient() {}
 
     // Parameterized constructor
     public Patient(UUID patientId, String name, String email, String passwordHash, String phone,
-                   String address, String gender, Date dateOfBirth, boolean isActive, Date registrationDate, Blob pfp) {
+                   String address, String gender, Date dateOfBirth, boolean isActive, Date registrationDate, byte[] pfp) {
         this.patientId = patientId;
         this.name = name;
         this.email = email;
@@ -35,6 +37,33 @@ public class Patient {
         this.registrationDate = registrationDate;
         this.pfp = pfp;
     }
+
+    public static Patient createFromRegistration(String name, String email, String plainPassword) {
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+        return new Patient(
+                UUID.randomUUID(),
+                name,
+                email,
+                hashedPassword,
+                null,      // phone
+                null,      // address
+                null,      // gender
+                null,      // dateOfBirth
+                true,      // isActive
+                new Date(System.currentTimeMillis()), // registrationDate
+                null       // pfp
+        );
+    }
+
+
+    public static Patient createFromDatabase(UUID patientId, String name, String email, String passwordHash,
+                                             String phone, String address, String gender, Date dateOfBirth,
+                                             boolean isActive, Date registrationDate, byte[] pfp) {
+        return new Patient(patientId, name, email, passwordHash, phone, address, gender,
+                dateOfBirth, isActive, registrationDate, pfp);
+    }
+
+
 
     // Getters and Setters
     public UUID getPatientId() {
@@ -117,11 +146,11 @@ public class Patient {
         this.registrationDate = registrationDate;
     }
 
-    public Blob getPfp() {
+    public byte[] getPfp() {
         return pfp;
     }
 
-    public void setPfp(Blob pfp) {
+    public void setPfp(byte[] pfp) {
         this.pfp = pfp;
     }
 }

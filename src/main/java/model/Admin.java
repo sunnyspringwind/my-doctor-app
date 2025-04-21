@@ -67,7 +67,6 @@ public class Admin {
     public void setActive(boolean active) {
         isActive = active;
     }
-
     public Date getLastLogin() {
         return lastLogin;
     }
