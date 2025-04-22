@@ -67,7 +67,7 @@ public class LoginServlet extends HttpServlet {
             //session and cookie creation
             if (user instanceof Doctor doctor) {  //using Java’s pattern matching for instanceof
                 HttpSession session = request.getSession();
-                session.setMaxInactiveInterval(60);
+                session.setMaxInactiveInterval(1500);
                 session.setAttribute("user", doctor);
                 session.setAttribute("role", role);
                 if ("on".equalsIgnoreCase(remember)) {
@@ -87,7 +87,7 @@ public class LoginServlet extends HttpServlet {
             //session and cookie creation
                 if (user instanceof Patient patient) {
                     HttpSession session = request.getSession();
-                    session.setMaxInactiveInterval(60);
+                    session.setMaxInactiveInterval(1500);
                     session.setAttribute("user", patient);
                     session.setAttribute("role", role);
 

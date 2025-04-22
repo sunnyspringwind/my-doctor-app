@@ -1,4 +1,4 @@
-CREATE DATABASE myDoctorDb;
+
 
 USE myDoctorDb;
 -- Patient Table

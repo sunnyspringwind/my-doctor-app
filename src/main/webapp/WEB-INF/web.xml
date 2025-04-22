@@ -8,19 +8,22 @@
                       https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
          version="5.0">
 
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>MyDoctorApp</display-name>
 
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
 
-    <!--hiding .jsp feels kool-->
-    <servlet>
-      <servlet-name>HomeServlet</servlet-name>
-      <servlet-class>controller.HomeServlet</servlet-class>
-    </servlet>
+  <!--hiding .jsp feels kool-->
+  <servlet>
+    <servlet-name>HomeServlet</servlet-name>
+    <servlet-class>controller.HomeServlet</servlet-class>
+  </servlet>
 
-    <servlet-mapping>
-      <servlet-name>HomeServlet</servlet-name>
-      <url-pattern>/home</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>HomeServlet</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
 
 </web-app>
 
