@@ -120,6 +120,8 @@
     </style>
 </head>
 <body>
+    <jsp:include page="../components/message.jsp"/>
+    
     <div class="container">
         <h1>Create an Account</h1>
         <p class="subtitle">Please sign up to access your account</p>
@@ -145,15 +147,6 @@
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="********">
-            </div>
-
-            <div class="form-group">
-                <label for="role">Role</label>
-                <select id="role" name="role">
-                    <option value="">Select role</option>
-                    <option value="DOCTOR">Doctor</option>
-                    <option value="PATIENT">Patient</option>
-                </select>
             </div>
 
             <button type="submit">Register</button>
@@ -186,9 +179,8 @@
             const name = document.forms["registerForm"]["name"].value.trim();
             const email = document.forms["registerForm"]["email"].value.trim();
             const password = document.forms["registerForm"]["password"].value.trim();
-            const role = document.forms["registerForm"]["role"].value;
 
-            if (!name || !email || !password || !role) {
+            if (!name || !email || !password) {
                 errorDiv.style.display = "block";
                 errorDiv.innerHTML = "Please fill in all fields.";
                 return false;
