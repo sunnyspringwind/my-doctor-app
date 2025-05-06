@@ -17,24 +17,25 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- Use tag libraries in your JSP pages to reduce scriptlet code and make your pages more readable -->
-    <!-- java servlet jstl -->
+    <!-- Remove existing JSTL dependencies and add these -->
     <dependency>
       <groupId>jakarta.servlet.jsp.jstl</groupId>
       <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
       <version>2.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+
+
+
     <!--mysql driver -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>8.0.33</version> <!-- Or latest stable -->
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.web</groupId>
-      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-      <version>2.0.0</version>
     </dependency>
 
     <!-- ihttps://mvnrepository.com/artifact/org.mindrot/jbcrypt -->

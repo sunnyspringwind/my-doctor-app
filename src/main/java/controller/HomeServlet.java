@@ -6,10 +6,30 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
-@WebServlet(name = "HomeServlet", value = "/")
+/**landing page, logs in and redirects to appropriate dashboard if cookies exists*/
+@WebServlet(name = "HomeServlet", urlPatterns = {"/", "/home"})
 public class HomeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher( "index.jsp");
+        HttpSession session = request.getSession(false);
+        Object user = session.getAttribute("user");
+        String role = (String) session.getAttribute("role");
+
+        if (user != null) {
+            switch (role) {
+                case "admin":
+                    response.sendRedirect(request.getContextPath()+"/admin");
+                    break;
+                    case "doctor":
+                        response.sendRedirect(request.getContextPath()+"/doctor");
+                        break;
+                        default:
+                            response.sendRedirect(request.getContextPath()+"/login");
+                            break;
+            }
+        } else {
+            response.sendRedirect(request.getContextPath() + "/login");
+        }
     }
+
 }

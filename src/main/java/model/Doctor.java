@@ -1,41 +1,117 @@
 package model;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Blob;
-import java.util.Date;
 import java.util.UUID;
 
-/**
- * Doctor class that extends User with doctor-specific attributes
- */
-public class Doctor extends User {
+public class Doctor {
+    private UUID doctorId;
+    private String name;
+    private String email;
+    private String passwordHash;
+    private String speciality;
+    private int experience;
+    private float fees;
     private String degree;
-    private String specialization;
-    private Float fee;
-    private Boolean isAvailable;
+    private boolean isAvailable;
+    private byte[] pfp;
 
-    // Constructor with all fields including password
-    public Doctor(UUID id, String firstName, String lastName, String email,
-                  String passwordHash, String address, String phone,
-                  Blob pfp, String gender, Date dateOfBirth,
-                  String degree, String specialization, Float fee, Boolean isAvailable) {
-        super(id, firstName, lastName, email, passwordHash, address, phone, "DOCTOR", pfp, gender, dateOfBirth);
+    //Default constructor
+    public Doctor() {}
+
+    // Parameterized constructor
+    public Doctor(UUID doctorId, String name, String email, String passwordHash, String speciality,
+                  int experience, float fees, String degree, boolean isAvailable, byte[] pfp) {
+        this.doctorId = doctorId;
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.speciality = speciality;
+        this.experience = experience;
+        this.fees = fees;
         this.degree = degree;
-        this.specialization = specialization;
-        this.fee = fee;
         this.isAvailable = isAvailable;
+        this.pfp = pfp;
     }
 
-    // Constructor without password for view purposes
-    public Doctor(UUID id, String firstName, String lastName, String email,
-                  String address, String phone, Blob pfp, String gender,
-                  Date dateOfBirth, String degree, String specialization, Float fee, Boolean isAvailable) {
-        super(id, firstName, lastName, email, address, phone, "DOCTOR", pfp, gender, dateOfBirth);
-        this.degree = degree;
-        this.specialization = specialization;
-        this.fee = fee;
-        this.isAvailable = isAvailable;
+    // 🔐 1. Factory method for registration (add UUID, hashes the plain password)
+    public static Doctor createFromRegistration(String name, String email, String plainPassword, String speciality,
+                                                int experience, float fees, String degree, boolean isAvailable, byte[] pfp) {
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
+        return new Doctor(UUID.randomUUID(), name, email, hashedPassword, speciality,
+                experience, fees, degree, isAvailable, pfp);
     }
 
-    // Getters and Setters for Doctor-specific fields
+    public static Doctor createFromRegistration(String name, String email, String plainPassword) {
+        return createFromRegistration(name, email, plainPassword, null, 0, 0, null, true, null);
+    }
+
+
+    // 🗂️ 2. Factory method for loading from the database (uses pre-hashed password)
+    public static Doctor createFromDatabase(UUID doctorId, String name, String email, String passwordHash,
+                                            String speciality, int experience, float fees, String degree,
+                                            boolean isAvailable, byte[] pfp) {
+        return new Doctor(doctorId, name, email, passwordHash, speciality,
+                experience, fees, degree, isAvailable, pfp);
+    }
+
+    // Getters and Setters
+    public UUID getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(UUID doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(String speciality) {
+        this.speciality = speciality;
+    }
+    public int getExperience() {
+        return experience;
+    }
+
+    public void setExperience(int experience) {
+        this.experience = experience;
+    }
+
+    public float getFees() {
+        return fees;
+    }
+
+    public void setFees(float fees) {
+        this.fees = fees;
+    }
+
     public String getDegree() {
         return degree;
     }
@@ -44,27 +120,36 @@ public class Doctor extends User {
         this.degree = degree;
     }
 
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public Float getFee() {
-        return fee;
-    }
-
-    public void setFee(Float fee) {
-        this.fee = fee;
-    }
-
-    public Boolean getAvailable() {
+    public boolean isAvailable() {
         return isAvailable;
     }
 
-    public void setAvailable(Boolean available) {
-        this.isAvailable = available;
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
+
+    public byte[] getPfp() {
+        return pfp;
+    }
+
+    public void setPfp(byte[] pfp) {
+        this.pfp = pfp;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "doctorId=" + doctorId +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", speciality='" + speciality + '\'' +
+                ", experience=" + experience +
+                ", available=" + isAvailable +
+                ", fees=" + fees +
+                ", degree='" + degree + '\'' +
+                ", pfp=" + (pfp != null ? "present" : "null") +
+                '}';
+    }
+
+
 }
