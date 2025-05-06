@@ -130,6 +130,8 @@
     </style>
 </head>
 <body>
+    <jsp:include page="../components/message.jsp"/>
+    
     <div class="container">
         <h1>Login</h1>
         <p>Please log in to access your account</p>
@@ -155,6 +157,7 @@
                 <label for="role">Role</label>
                 <select id="role" name="role" required>
                     <option value="">Select a role</option>
+                    <option value="admin">Admin</option>
                     <option value="doctor">Doctor</option>
                     <option value="patient">Patient</option>
                 </select>
