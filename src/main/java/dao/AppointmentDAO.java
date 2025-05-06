@@ -1,12 +1,15 @@
 package dao;
 
 import model.Appointment;
+import model.DoctorData;
 import utils.DBUtil;
 import utils.StatusCode;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
+import java.time.format.DateTimeFormatter;
 
 public class AppointmentDAO implements IAppointmentDAO {
 
@@ -14,7 +17,7 @@ public class AppointmentDAO implements IAppointmentDAO {
     public StatusCode insertAppointment(Appointment appointment) {
         String sql = "INSERT INTO appointment (doctorId, patientId, appointmentTime, status, reason, payment) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, appointment.getDoctorId());
             ps.setString(2, appointment.getPatientId());
             ps.setTimestamp(3, appointment.getAppointmentTime());
@@ -33,15 +36,35 @@ public class AppointmentDAO implements IAppointmentDAO {
 
     @Override
     public List<Appointment> getAllAppointments() {
-        String sql = "SELECT * FROM appointment";
+        String sql = "SELECT a.*, d.name as doctor_name, d.pfp as doctor_image, d.speciality as doctor_speciality, d.address as doctor_address, "
+                +
+                "p.name as patient_name " +
+                "FROM appointment a " +
+                "JOIN doctor d ON a.doctorId = d.doctorId " +
+                "JOIN patient p ON a.patientId = p.patientId " +
+                "ORDER BY a.appointmentTime DESC";
+
         List<Appointment> appointments = new ArrayList<>();
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            System.out.println("Executing getAllAppointments query");
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
-                appointments.add(mapResultSetToAppointment(rs));
+                Appointment appointment = mapResultSetToAppointment(rs);
+                appointment.setPatientName(rs.getString("patient_name"));
+                appointments.add(appointment);
+                System.out.println("Found appointment: ID=" + appointment.getAppointmentId() +
+                        ", Doctor=" + appointment.getDocData().getName() +
+                        ", Patient=" + appointment.getPatientName() +
+                        ", Time=" + appointment.getAppointmentTime());
             }
+
+            System.out.println("Total appointments found: " + appointments.size());
+
         } catch (SQLException e) {
+            System.err.println("Error in getAllAppointments: " + e.getMessage());
             e.printStackTrace();
         }
         return appointments;
@@ -49,10 +72,15 @@ public class AppointmentDAO implements IAppointmentDAO {
 
     @Override
     public Appointment getAppointmentById(int id) {
-        String sql = "SELECT * FROM appointment WHERE appointmentId = ?";
+        String sql = "SELECT a.*, " +
+                "d.name as doctor_name, d.pfp as doctor_image, d.speciality as doctor_speciality, d.address as doctor_address "
+                +
+                "FROM appointment a " +
+                "JOIN doctor d ON a.doctorId = CAST(d.doctorId as VARCHAR(255)) " +
+                "WHERE a.appointmentId = ?";
         Appointment appointment = null;
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -66,23 +94,45 @@ public class AppointmentDAO implements IAppointmentDAO {
 
     @Override
     public List<Appointment> getAppointmentByDoctorId(String doctorId) {
-        String sql = "SELECT * FROM appointment WHERE doctorId = ? ORDER BY appointmentTime";
+        String sql = "SELECT a.*, d.name as doctor_name, d.pfp as doctor_image, d.speciality as doctor_speciality, d.address as doctor_address FROM appointment a "
+                +
+                "JOIN doctor d ON a.doctorId = CAST(d.doctorId as VARCHAR) " +
+                "WHERE a.doctorId = ? ORDER BY a.appointmentTime";
         List<Appointment> appointmentList = new ArrayList<>();
         return getAppointments(doctorId, appointmentList, sql);
     }
 
     @Override
     public List<Appointment> getAppointmentsByPatientId(String patientId) {
-        String sql = "SELECT * FROM appointment WHERE patientId = ? ORDER BY appointmentTime";
+        String sql = "SELECT a.*, " +
+                "d.name as doctor_name, d.pfp as doctor_image, d.speciality as doctor_speciality, d.address as doctor_address "
+                +
+                "FROM appointment a " +
+                "JOIN doctor d ON a.doctorId = CAST(d.doctorId as VARCHAR(255)) " +
+                "WHERE a.patientId = ? ORDER BY a.appointmentTime";
         List<Appointment> appointmentList = new ArrayList<>();
-        return getAppointments(patientId, appointmentList, sql);
+        try (Connection conn = DBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            System.out.println("Executing query for patient ID: " + patientId);
+            ps.setString(1, patientId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                System.out.println("Found appointment with ID: " + rs.getInt("appointmentId"));
+                appointmentList.add(mapResultSetToAppointment(rs));
+            }
+            System.out.println("Total appointments found: " + appointmentList.size());
+        } catch (SQLException e) {
+            System.out.println("Error executing query: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return appointmentList;
     }
 
     @Override
     public StatusCode updateAppointmentStatus(int appointmentId, String status) {
         String sql = "UPDATE appointment SET status = ? WHERE appointmentId = ?";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setInt(2, appointmentId);
             int rows = stmt.executeUpdate();
@@ -97,7 +147,7 @@ public class AppointmentDAO implements IAppointmentDAO {
     public StatusCode deleteAppointment(int appointmentId) {
         String sql = "DELETE FROM appointment WHERE appointmentId = ?";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, appointmentId);
             int rows = stmt.executeUpdate();
             return rows > 0 ? StatusCode.SUCCESS : StatusCode.APPOINTMENT_DELETION_FAILED;
@@ -111,7 +161,7 @@ public class AppointmentDAO implements IAppointmentDAO {
     public StatusCode doesAppointmentExist(String doctorId, Timestamp appointmentTime) {
         String sql = "SELECT 1 FROM appointment WHERE appointmentTime = ? AND doctorId = ?";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, appointmentTime);
             ps.setString(2, doctorId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -128,7 +178,7 @@ public class AppointmentDAO implements IAppointmentDAO {
 
     private static List<Appointment> getAppointments(String userId, List<Appointment> appointmentList, String sql) {
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -149,6 +199,19 @@ public class AppointmentDAO implements IAppointmentDAO {
         appointment.setStatus(rs.getString("status"));
         appointment.setReason(rs.getString("reason"));
         appointment.setPayment(rs.getFloat("payment"));
+        appointment.setSlotDate(rs.getTimestamp("appointmentTime").toLocalDateTime()
+                .format(DateTimeFormatter.ofPattern("MMM dd, yyyy hh:mm a")));
+        appointment.setCancelled(rs.getString("status").equalsIgnoreCase("CANCELLED"));
+
+        // Set doctor data
+        DoctorData docData = new DoctorData();
+        docData.setName(rs.getString("doctor_name"));
+        byte[] imageBytes = rs.getBytes("doctor_image");
+        docData.setImage(imageBytes != null ? Base64.getEncoder().encodeToString(imageBytes) : null);
+        docData.setSpeciality(rs.getString("doctor_speciality"));
+        docData.setAddress(rs.getString("doctor_address"));
+        appointment.setDocData(docData);
+
         return appointment;
     }
 }
