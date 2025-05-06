@@ -10,7 +10,6 @@ import service.IPatientService;
 import service.PatientService;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.UUID;
 
 @WebServlet(name = "PatientServlet", urlPatterns = {"/user", "/user/*"})
@@ -29,7 +28,7 @@ public class PatientServlet extends HttpServlet {
         Patient patient = (Patient) session.getAttribute("user");
         System.out.println(patient.toString());
         request.setAttribute("user", patient);
-        request.getRequestDispatcher("/WEB-INF/view/user-dashboard.jsp").forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/");
     }
 
     @Override
@@ -89,7 +88,7 @@ public class PatientServlet extends HttpServlet {
         if (isUpdated) {
             System.out.println("Patient profile updated");
             session.setAttribute("user", patient);
-            request.getRequestDispatcher("/WEB-INF/view/user-dashboard.jsp").forward(request, response);
+            response.sendRedirect(request.getContextPath() + "/");
         }
     }
 
