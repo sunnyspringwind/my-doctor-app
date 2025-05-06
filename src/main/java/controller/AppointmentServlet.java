@@ -13,7 +13,6 @@ import dao.DoctorDAO;
 import model.Appointment;
 import model.Doctor;
 import utils.StatusCode;
-import utils.ServiceResponse;
 
 import java.io.IOException;
 import java.sql.Timestamp;
