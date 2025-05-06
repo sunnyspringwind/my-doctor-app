@@ -18,14 +18,17 @@ public class HomeServlet extends HttpServlet {
         if (user != null) {
             switch (role) {
                 case "admin":
-                    response.sendRedirect(request.getContextPath()+"/admin");
+                    response.sendRedirect(request.getContextPath()+"/admin/dashboard");
                     break;
-                    case "doctor":
-                        response.sendRedirect(request.getContextPath()+"/doctor");
-                        break;
-                        default:
-                            response.sendRedirect(request.getContextPath()+"/login");
-                            break;
+                case "doctor":
+                    response.sendRedirect(request.getContextPath()+"/doctor");
+                    break;
+                case "patient":
+                    response.sendRedirect(request.getContextPath()+"/user");
+                    break;
+                default:
+                    response.sendRedirect(request.getContextPath()+"/login");
+                    break;
             }
         } else {
             response.sendRedirect(request.getContextPath() + "/login");
