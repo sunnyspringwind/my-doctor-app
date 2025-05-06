@@ -40,7 +40,7 @@ public class PatientDAO implements IPatientDAO {
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, String.valueOf(patient.getPatientId()));  // Use UUID as string
+            stmt.setString(1, String.valueOf(patient.getPatientId())); // Use UUID as string
             stmt.setString(2, patient.getName());
             stmt.setString(3, patient.getEmail());
             stmt.setString(4, patient.getPasswordHash());
@@ -80,16 +80,21 @@ public class PatientDAO implements IPatientDAO {
     @Override
     public Patient getPatientByEmail(String email) {
         String sql = "SELECT * FROM Patient WHERE email = ?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtil.getConnection()) {
+            if (conn == null) {
+                throw new SQLException("Database connection is null");
+            }
 
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, email);
-            ResultSet rs = stmt.executeQuery();
-
+                try (ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
                 return createPatientFromResultSet(rs);
+                    }
+                }
             }
         } catch (SQLException e) {
+            System.err.println("Error in getPatientByEmail: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -98,13 +103,13 @@ public class PatientDAO implements IPatientDAO {
     @Override
     public Patient getPatientByPhone(String phone) {
         String sql = "SELECT * FROM Patient WHERE phone = ?";
-        try(Connection conn = DBUtil.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = DBUtil.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return createPatientFromResultSet(rs);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
@@ -129,25 +134,41 @@ public class PatientDAO implements IPatientDAO {
 
     @Override
     public boolean updatePatient(Patient patient) {
-        String sql = "UPDATE Patient SET name=?, email=?, phone=?, address=?, gender=?, dateOfBirth=?, isActive=?, registrationDate=?, pfp=? " +
-                "WHERE patientId=?";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        System.out.println("Updating patient with ID: " + patient.getPatientId());
+        
+        String sql = "UPDATE Patient SET name=?, phone=?, address=?, gender=?, dateOfBirth=?, pfp=? WHERE patientId=?";
+        try (Connection conn = DBUtil.getConnection()) {
+            if (conn == null) {
+                System.err.println("Database connection is null");
+                return false;
+            }
+            
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                // Log the values being updated
+                System.out.println("Setting values:");
+                System.out.println("Name: " + patient.getName());
+                System.out.println("Phone: " + patient.getPhone());
+                System.out.println("Address: " + patient.getAddress());
+                System.out.println("Gender: " + patient.getGender());
+                System.out.println("DOB: " + patient.getDateOfBirth());
+                System.out.println("Profile Picture: " + (patient.getPfp() != null ? "Present" : "Not present"));
+                System.out.println("Patient ID: " + patient.getPatientId());
 
             stmt.setString(1, patient.getName());
-            stmt.setString(2, patient.getEmail());
-            stmt.setString(3, patient.getPhone());
-            stmt.setString(4, patient.getAddress());
-            stmt.setString(5, patient.getGender());
-            stmt.setDate(6, patient.getDateOfBirth());
-            stmt.setBoolean(7, patient.isActive());
-            stmt.setDate(8, patient.getRegistrationDate());
-            stmt.setBytes(9, patient.getPfp());
-            stmt.setString(10, patient.getPatientId().toString());
+                stmt.setString(2, patient.getPhone());
+                stmt.setString(3, patient.getAddress());
+                stmt.setString(4, patient.getGender());
+                stmt.setDate(5, patient.getDateOfBirth());
+                stmt.setBytes(6, patient.getPfp());
+                stmt.setString(7, patient.getPatientId().toString());
 
             int rowsAffected = stmt.executeUpdate();
+                System.out.println("Rows affected: " + rowsAffected);
+                
             return rowsAffected > 0;
+            }
         } catch (SQLException e) {
+            System.err.println("Error updating patient: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -233,6 +254,7 @@ public class PatientDAO implements IPatientDAO {
         patient.setDateOfBirth(rs.getDate("dateOfBirth"));
         patient.setActive(rs.getBoolean("isActive"));
         patient.setRegistrationDate(rs.getDate("registrationDate"));
+        patient.setPfp(rs.getBytes("pfp"));
         return patient;
     }
 }
