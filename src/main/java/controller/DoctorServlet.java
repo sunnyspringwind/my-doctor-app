@@ -8,14 +8,8 @@ import jakarta.servlet.annotation.*;
 import model.Doctor;
 import service.DoctorService;
 import service.IDoctorService;
-import utils.DBUtil;
-import utils.StatusCode;
 
-import javax.mail.Session;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.UUID;
 
 @WebServlet(name = "DoctorServlet", urlPatterns = { "/doctor", "/doctor/*"})
@@ -33,7 +27,7 @@ public class DoctorServlet extends HttpServlet {
         Doctor doctor = (Doctor) session.getAttribute("user");
         System.out.println(doctor.toString());
         request.setAttribute("user", doctor);
-        request.getRequestDispatcher("/WEB-INF/view/doctor-dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/view/Doctor/doctor-dashboard.jsp").forward(request, response);
     }
 
     @Override
@@ -77,7 +71,7 @@ public class DoctorServlet extends HttpServlet {
         if (isUpdated) {
             System.out.println("Doctor profile updated");
             session.setAttribute("user", doctor);
-            request.getRequestDispatcher("/WEB-INF/view/doctor-dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/view/Doctor/doctor-dashboard.jsp").forward(request, response);
         }
 
     }
