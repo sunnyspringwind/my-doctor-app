@@ -1,27 +1,25 @@
 package controller;
 
+import dao.AdminDAO;
 import dao.DoctorDAO;
 import dao.PatientDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
+import model.Admin;
 import model.Doctor;
 import model.Patient;
-import model.User;
-import service.DoctorService;
-import service.IDoctorService;
-import service.IPatientService;
-import service.PatientService;
+import service.*;
 import utils.CookieChief;
-import utils.StatusCode;
 
 import java.io.IOException;
-import java.sql.Date;
+
 @WebServlet(name = "LoginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
 
     IDoctorService doctorService = new DoctorService(new DoctorDAO());
     IPatientService patientService = new PatientService(new PatientDAO());
+    IAdminService adminService = new AdminService(new AdminDAO());
 
     /** checks session status, redirects to home page or login */
     @Override
@@ -48,63 +46,77 @@ public class LoginServlet extends HttpServlet {
 
         // Input validation
         if (email == null || password == null || role == null) {
-            request.setAttribute("error", "Please fill all the fields");
-            request.getRequestDispatcher("/WEB-INF/view/login.jsp").forward(request, response);
+            HttpSession session = request.getSession();
+            session.setAttribute("message", "Please fill all the fields");
+            session.setAttribute("messageType", "error");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
         //clean inputs
         email = email.trim();
         password = password.trim();
         role = role.trim();
-        remember = remember.trim();
+        remember = (remember != null) ? remember.trim() : "";
 
         Object user = null;
 
-        // Login for doctor user
-        if ("doctor".equalsIgnoreCase(role)) {
-            user = doctorService.loginDoctor(email, password);
-
-            //session and cookie creation
-            if (user instanceof Doctor doctor) {  //using Java’s pattern matching for instanceof
+        // Role-based login
+        if ("admin".equalsIgnoreCase(role)) {
+            user = adminService.login(email, password);
+            if (user instanceof Admin admin) {
                 HttpSession session = request.getSession();
-                session.setMaxInactiveInterval(1500);
+                session.setMaxInactiveInterval(15 * 60); // 15 minutes in seconds
+                session.setAttribute("user", admin);
+                session.setAttribute("role", role);
+                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                return;
+            }
+        } else if ("doctor".equalsIgnoreCase(role)) {
+            user = doctorService.loginDoctor(email, password);
+            if (user instanceof Doctor doctor) {
+                HttpSession session = request.getSession();
+                session.setMaxInactiveInterval(15 * 60); // 15 minutes in seconds
                 session.setAttribute("user", doctor);
                 session.setAttribute("role", role);
-                if ("on".equalsIgnoreCase(remember)) {
-                    Cookie emailCookie = CookieChief.makeCookie("doc_email", email, 7);
-                    Cookie roleCookie = CookieChief.makeCookie("doc_role", role, 7);
-                    response.addCookie(emailCookie);
-                    response.addCookie(roleCookie);
-                }
-                response.sendRedirect(request.getContextPath() + "/doctor");
-                return; //they said code keep executing if not return
+                session.setAttribute("message", "Welcome back, Dr. " + doctor.getName());
+                session.setAttribute("messageType", "success");
+
+                // Always set cookies with 15 minutes expiration
+                Cookie emailCookie = CookieChief.makeCookieWithMinutes("doc_email", email, 15);
+                Cookie roleCookie = CookieChief.makeCookieWithMinutes("doc_role", role, 15);
+                response.addCookie(emailCookie);
+                response.addCookie(roleCookie);
+                
+                response.sendRedirect(request.getContextPath() + "/doctor/dashboard");
+                return;
+            }
+        } else if ("patient".equalsIgnoreCase(role)) {
+            user = patientService.loginPatient(email, password);
+            if (user instanceof Patient patient) {
+                HttpSession session = request.getSession();
+                session.setMaxInactiveInterval(24 * 60 * 60); // 24 hours in seconds
+                session.setAttribute("user", patient);
+                session.setAttribute("role", role);
+                session.setAttribute("message", "Welcome back, " + patient.getName());
+                session.setAttribute("messageType", "success");
+
+                // Set cookies with longer expiration if remember me is checked
+                int cookieAge = "on".equals(remember) ? 30 * 24 * 60 : 24 * 60; // 30 days or 24 hours in minutes
+                Cookie emailCookie = CookieChief.makeCookieWithMinutes("pat_email", email, cookieAge);
+                Cookie roleCookie = CookieChief.makeCookieWithMinutes("pat_role", role, cookieAge);
+                response.addCookie(emailCookie);
+                response.addCookie(roleCookie);
+                
+                response.sendRedirect(request.getContextPath() + "/user");
+                return;
             }
         }
-        // Login for patient user
-        else if ("patient".equalsIgnoreCase(role)) {
-            user = patientService.loginPatient(email, password);
 
-            //session and cookie creation
-                if (user instanceof Patient patient) {
-                    HttpSession session = request.getSession();
-                    session.setMaxInactiveInterval(1500);
-                    session.setAttribute("user", patient);
-                    session.setAttribute("role", role);
-
-                    //remember me cookie optional
-                    if ("on".equalsIgnoreCase(remember)) {
-                        Cookie emailCookie = CookieChief.makeCookie("pat_email", email, 7);
-                        Cookie roleCookie = CookieChief.makeCookie("pat_role", role, 7);
-                        response.addCookie(emailCookie);
-                        response.addCookie(roleCookie);
-                    }
-                    response.sendRedirect(request.getContextPath() + "/user");
-                    return;
-                }
-        }
-
-            // If login fails
-            request.setAttribute("error", "Invalid credentials or role");
-            request.getRequestDispatcher("/WEB-INF/view/login.jsp").forward(request, response);
+        // If login fails
+        HttpSession session = request.getSession();
+        session.setAttribute("message", "Invalid credentials or role");
+        session.setAttribute("messageType", "error");
+        response.sendRedirect(request.getContextPath() + "/login");
     }
 }
