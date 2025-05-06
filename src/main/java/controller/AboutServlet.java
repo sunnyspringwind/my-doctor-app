@@ -14,7 +14,7 @@ public class AboutServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/view/about.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/view/Patient/about.jsp");
         dispatcher.forward(request, response);
     }
 } 
