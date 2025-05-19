@@ -106,6 +106,35 @@
         background-color: #dbeafe;
     }
 
+    .doctor-card.unavailable {
+        position: relative;
+        cursor: pointer;
+    }
+    .doctor-card.unavailable::after {
+        content: "Unavailable";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        display: none;
+        z-index: 1;
+    }
+    .doctor-card.unavailable:hover::after {
+        display: block;
+    }
+
+    .doctor-card.unavailable .availability p[data-available="false"] {
+        color: #9CA3AF !important;
+    }
+    .doctor-card.unavailable .availability-dot[data-available="false"] {
+        background-color: #9CA3AF !important;
+    }
+
     @media (max-width: 1200px) {
         .doctors-grid {
             grid-template-columns: repeat(3, 1fr);
@@ -132,168 +161,39 @@
     </p>
     
     <div class="doctors-grid">
-        <!-- Doctor 1 - General physician -->
-        <a href="${pageContext.request.contextPath}/appointment/doc1" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc1.png" 
-                alt="Dr. Ganesh Lama" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
+        <c:forEach var="doctor" items="${topDoctors}" varStatus="status">
+            <a href="${pageContext.request.contextPath}/appointment?id=${doctor.doctorId}"
+               class="doctor-card ${!doctor.available ? 'unavailable' : ''}"
+               data-available="${doctor.available}"
+               onclick="return checkTopDoctorAvailability(event, '${doctor.available}', '${doctor.name}')">
+                <img src="${pageContext.request.contextPath}/pfp?role=doctor&userId=${doctor.doctorId}" 
+                    alt="${doctor.name}" 
+                    class="doctor-image"
+                    onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
+                <div class="doctor-info">
+                    <div class="availability">
+                        <div class="availability-dot" data-available="${doctor.available}"></div>
+                        <p data-available="${doctor.available}">${doctor.available ? 'Available' : 'Not Available'}</p>
+                    </div>
+                    <h3 class="doctor-name">${doctor.name}</h3>
+                    <p class="doctor-speciality">${doctor.speciality}</p>
                 </div>
-                <h3 class="doctor-name">Dr. Ganesh Lama</h3>
-                <p class="doctor-speciality">General physician</p>
-            </div>
-        </a>
-
-        <!-- Doctor 2 - Gynecologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc2" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc2.png" 
-                alt="Dr. Bandana Khanal" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Bandana Khanal</h3>
-                <p class="doctor-speciality">Gynecologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 3 - Dermatologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc3" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc3.png" 
-                alt="Dr. Anil Kumar Bhatta" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Anil Kumar Bhatta</h3>
-                <p class="doctor-speciality">Dermatologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 4 - Pediatricians -->
-        <a href="${pageContext.request.contextPath}/appointment/doc4" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc4.png" 
-                alt="Dr. Arnav Shrestha" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Arnav Shrestha</h3>
-                <p class="doctor-speciality">Pediatricians</p>
-            </div>
-        </a>
-
-        <!-- Doctor 5 - Neurologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc5" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc5.png" 
-                alt="Dr. Isha Dhungana" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Isha Dhungana</h3>
-                <p class="doctor-speciality">Neurologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 6 - Gastroenterologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc6" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc6.png" 
-                alt="Dr. Shekhar Poudel" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Shekhar Poudel</h3>
-                <p class="doctor-speciality">Gastroenterologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 7 - General physician -->
-        <a href="${pageContext.request.contextPath}/appointment/doc7" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc7.png" 
-                alt="Dr. Kovid Nepal" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Kovid Nepal</h3>
-                <p class="doctor-speciality">General physician</p>
-            </div>
-        </a>
-
-        <!-- Doctor 8 - Gynecologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc8" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc8.png" 
-                alt="Dr. Parag karki" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Parag karki</h3>
-                <p class="doctor-speciality">Gynecologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 9 - Dermatologist -->
-        <a href="${pageContext.request.contextPath}/appointment/doc9" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc9.png" 
-                alt="Dr. Subekcha Karki" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Subekcha Karki</h3>
-                <p class="doctor-speciality">Dermatologist</p>
-            </div>
-        </a>
-
-        <!-- Doctor 10 - Pediatricians -->
-        <a href="${pageContext.request.contextPath}/appointment/doc10" class="doctor-card">
-            <img src="${pageContext.request.contextPath}/assets/images/doc10.png" 
-                alt="Dr. Poonam Sharma" 
-                class="doctor-image"
-                onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/assets/images/profile_pic.png';">
-            <div class="doctor-info">
-                <div class="availability">
-                    <div class="availability-dot" data-available="true"></div>
-                    <p>Available</p>
-                </div>
-                <h3 class="doctor-name">Dr. Poonam Sharma</h3>
-                <p class="doctor-speciality">Pediatricians</p>
-            </div>
-        </a>
+            </a>
+        </c:forEach>
     </div>
 
     <button class="more-button" onclick="window.location.href='${pageContext.request.contextPath}/doctors'">
         MORE
     </button>
 </div>
+
+<script>
+function checkTopDoctorAvailability(event, isAvailable, doctorName) {
+    if (isAvailable === 'false') {
+        event.preventDefault();
+        alert(doctorName + " is currently unavailable. Please try another doctor.");
+        return false;
+    }
+    return true;
+}
+</script>

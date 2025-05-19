@@ -17,17 +17,14 @@ public class DoctorService implements IDoctorService {
     }
 
     // Register Doctor
-    public StatusCode registerDoctor(String name, String email, String password) {
+    public StatusCode registerDoctor(Doctor doctor) {
         // Check if the email already exists
-        if (doctorDAO.getDoctorByEmail(email) != null) {
+        if (doctorDAO.getDoctorByEmail(doctor.getEmail()) != null) {
             return StatusCode.EMAIL_ALREADY_EXISTS;
         }
-        // Create Doctor object
-        Doctor doctor = Doctor.createFromRegistration(name,email,password);
         // Add doctor to the database
         return doctorDAO.addDoctor(doctor);
     }
-
 
     // Doctor Login
     public Doctor loginDoctor(String email, String password) {
@@ -38,10 +35,8 @@ public class DoctorService implements IDoctorService {
         return null;  // Invalid credentials
     }
 
-
     // Update Doctor Profile
     public boolean updateDoctorProfile(Doctor updatedDoctor) {
-
         return doctorDAO.updateDoctor(updatedDoctor);
     }
 
@@ -56,9 +51,28 @@ public class DoctorService implements IDoctorService {
 //    }
 
     // Get Doctor by ID
-//    public Doctor getDoctorById(UUID doctorId) {
-//        return doctorDAO.getDoctorById(doctorId);
-//    }
+    public Doctor getDoctorById(String doctorId) {
+        System.out.println("DoctorService: Getting doctor by ID: " + doctorId);
+        try {
+            UUID uuid = UUID.fromString(doctorId);
+            System.out.println("DoctorService: Converted ID to UUID: " + uuid);
+            Doctor doctor = doctorDAO.getDoctorById(uuid);
+            if (doctor != null) {
+                System.out.println("DoctorService: Found doctor: " + doctor.toString());
+            } else {
+                System.err.println("DoctorService: No doctor found for ID: " + doctorId);
+            }
+            return doctor;
+        } catch (IllegalArgumentException e) {
+            System.err.println("DoctorService: Invalid UUID format: " + doctorId);
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            System.err.println("DoctorService: Error getting doctor: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     // Get Doctor by Email
 //    public Doctor getDoctorByEmail(String email) {

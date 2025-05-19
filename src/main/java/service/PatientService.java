@@ -1,8 +1,6 @@
 package service;
 
 import dao.IPatientDAO;
-import dao.PatientDAO;
-import model.Doctor;
 import model.Patient;
 import org.mindrot.jbcrypt.BCrypt;
 import utils.StatusCode;

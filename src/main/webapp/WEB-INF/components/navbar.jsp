@@ -50,8 +50,9 @@
         border-style: solid;
         border-color: #e5e7eb;
         font-family: 'Outfit', sans-serif;
+        position: relative;
         top: 0;
-        z-index: 10;
+        z-index: 40;
         width: 100%;
         margin-bottom: 1.25rem;
         border-bottom-width: 1px;
@@ -221,6 +222,115 @@
         font-size: 1rem;
         padding: 0.75rem 1.5rem;
     }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+        z-index: 9999;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        padding: 0.5rem 0.75rem;
+        border-radius: 9999px;
+        transition: all 0.2s;
+        position: relative;
+        z-index: 9999;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #f3f4f6;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 0.5rem;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        min-width: 200px;
+        z-index: 10000;
+        display: none;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: #4B5563;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f3f4f6;
+        color: #20B2AA;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #e5e7eb;
+        margin: 0.5rem 0;
+    }
+
+    .user-avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 9999px;
+        object-fit: cover;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #4B5563;
+        margin-right: 0.5rem;
+    }
+
+    .dropdown-header {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .dropdown-avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 9999px;
+        object-fit: cover;
+    }
+
+    .dropdown-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .dropdown-name {
+        font-weight: 500;
+        color: #1F2937;
+        font-size: 0.875rem;
+    }
+
+    .dropdown-email {
+        color: #6B7280;
+        font-size: 0.75rem;
+    }
+
+    .dropdown-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-right: 0.75rem;
+    }
 </style>
 
 <div class="navbar-container">
@@ -236,7 +346,35 @@
             <a href="<%=request.getContextPath()%>/contact" class="nav-link ${pageContext.request.servletPath == '/contact' ? 'active' : ''}">CONTACT</a>
         </div>
 
-        <a href="<%=request.getContextPath()%>/register" class="create-account-btn">Create Account</a>
+        <c:choose>
+            <c:when test="${sessionScope.role eq 'patient'}">
+                <div class="dropdown">
+                    <div class="dropdown-toggle" onclick="toggleDropdown()">
+                        <img src="${empty sessionScope.user.pfp ? 
+                            pageContext.request.contextPath.concat('/assets/images/profile_pic.png') : 
+                            pageContext.request.contextPath.concat('/patient-profile-image?id=').concat(sessionScope.user.patientId)}" 
+                            alt="Profile" class="user-avatar">
+                        <img src="<%=request.getContextPath()%>/assets/images/dropdown_icon.svg" alt="Dropdown" style="width: 1rem;">
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="<%=request.getContextPath()%>/profile" class="dropdown-item">
+                            My Profile
+                        </a>
+                        <a href="<%=request.getContextPath()%>/my-appointments" class="dropdown-item">
+                            My Appointments
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="<%=request.getContextPath()%>/logout" class="dropdown-item">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <a href="<%=request.getContextPath()%>/register" class="create-account-btn">Create Account</a>
+            </c:otherwise>
+        </c:choose>
+
         <img class="menu-icon" src="<%=request.getContextPath()%>/assets/images/menu_icon.png" alt="Menu" onclick="toggleMobileMenu()">
     </nav>
 </div>
@@ -251,7 +389,11 @@
         <li><a href="<%=request.getContextPath()%>/doctors" class="nav-link ${pageContext.request.servletPath == '/doctors' || fn:startsWith(pageContext.request.servletPath, '/doctors/') ? 'active' : ''}" onclick="toggleMobileMenu()">ALL DOCTORS</a></li>
         <li><a href="<%=request.getContextPath()%>/about" class="nav-link ${pageContext.request.servletPath == '/about' ? 'active' : ''}" onclick="toggleMobileMenu()">ABOUT</a></li>
         <li><a href="<%=request.getContextPath()%>/contact" class="nav-link ${pageContext.request.servletPath == '/contact' ? 'active' : ''}" onclick="toggleMobileMenu()">CONTACT</a></li>
-        <li><a href="<%=request.getContextPath()%>/register" class="create-account-btn" onclick="toggleMobileMenu()">Create Account</a></li>
+        <c:if test="${sessionScope.role eq 'patient'}">
+            <li><a href="<%=request.getContextPath()%>/profile" class="nav-link" onclick="toggleMobileMenu()">MY PROFILE</a></li>
+            <li><a href="<%=request.getContextPath()%>/my-appointments" class="nav-link" onclick="toggleMobileMenu()">MY APPOINTMENTS</a></li>
+            <li><a href="<%=request.getContextPath()%>/logout" class="nav-link" onclick="toggleMobileMenu()">LOGOUT</a></li>
+        </c:if>
     </ul>
 </div>
 
@@ -260,6 +402,20 @@
         const mobileMenu = document.getElementById('mobileMenu');
         mobileMenu.classList.toggle('show');
     }
+
+    function toggleDropdown() {
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        dropdownMenu.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdown = document.querySelector('.dropdown');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        if (!dropdown.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
 
     // Hide navbar on login and register pages
     const hideNavbarPaths = ['/login', '/register'];

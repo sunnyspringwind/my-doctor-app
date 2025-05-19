@@ -3,9 +3,16 @@ package model;
 import java.sql.Timestamp;
 
 public class Appointment {
+    private String id;
+    private DoctorData docData;
+    private String slotDate;
+    private boolean cancelled;
     private int appointmentId;
     private String doctorId;
     private String patientId;
+    private String patientName;
+    private int patientAge;
+    private float fees;
     private Timestamp appointmentTime;
     private String status;
     private String reason;
@@ -34,6 +41,38 @@ public class Appointment {
     }
 
     // Getters and setters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public DoctorData getDocData() {
+        return docData;
+    }
+
+    public void setDocData(DoctorData docData) {
+        this.docData = docData;
+    }
+
+    public String getSlotDate() {
+        return slotDate;
+    }
+
+    public void setSlotDate(String slotDate) {
+        this.slotDate = slotDate;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
     public int getAppointmentId() {
         return appointmentId;
     }
@@ -56,6 +95,30 @@ public class Appointment {
 
     public void setPatientId(String patientId) {
         this.patientId = patientId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public int getPatientAge() {
+        return patientAge;
+    }
+
+    public void setPatientAge(int patientAge) {
+        this.patientAge = patientAge;
+    }
+
+    public float getFees() {
+        return fees;
+    }
+
+    public void setFees(float fees) {
+        this.fees = fees;
     }
 
     public Timestamp getAppointmentTime() {

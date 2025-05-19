@@ -1,7 +1,7 @@
 package utils;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
@@ -35,7 +35,7 @@ public class EmailSender {
     }
 
     public static Session getSession() {
-        return Session.getInstance(props, new javax.mail.Authenticator() {
+        return Session.getInstance(props, new jakarta.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(username, password);
             }

@@ -167,7 +167,7 @@
 </head>
 <body>
     <!-- Include the Navbar -->
-    <jsp:include page="../components/navbar.jsp" />
+    <jsp:include page="../../components/navbar.jsp" />
     
     <div class="main-content">
         <div class="contact-header">
@@ -205,7 +205,7 @@
 
     <!-- Include the Footer -->
     <div class="footer-wrapper">
-        <jsp:include page="../components/footer.jsp" />
+        <jsp:include page="../../components/footer.jsp" />
     </div>
 </body>
 </html>

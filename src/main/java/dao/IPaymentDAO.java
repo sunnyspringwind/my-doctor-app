@@ -3,7 +3,6 @@ package dao;
 import model.Payment;
 import utils.StatusCode;
 
-import java.util.List;
 
 public interface IPaymentDAO {
     public StatusCode createPayment(Payment payment);

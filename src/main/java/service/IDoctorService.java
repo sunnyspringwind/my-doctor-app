@@ -6,11 +6,11 @@ import utils.StatusCode;
 import java.util.List;
 
 public interface IDoctorService {
-    StatusCode registerDoctor(String name,String email,String password);
+    StatusCode registerDoctor(Doctor doctor);
     Doctor loginDoctor(String email, String password);
     boolean updateDoctorProfile(Doctor doctor);
+    Doctor getDoctorById(String doctorId);
 //    void setAvailability(String doctorId, boolean isAvailable);
-//    Doctor getDoctorById(String doctorId);
 //    List<Doctor> getDoctorsBySpeciality(String speciality);
     List<Doctor> getAllDoctors();
 }
