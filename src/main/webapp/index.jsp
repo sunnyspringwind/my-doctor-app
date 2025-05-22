@@ -69,7 +69,7 @@
         <jsp:include page="/WEB-INF/components/specialityMenu.jsp" />
         
         <!-- Top Doctors Section -->
-        <jsp:include page="/components/topDoctors" />
+        <jsp:include page="/WEB-INF/components/topDoctors.jsp" />
         
         <!-- Include the Banner -->
         <jsp:include page="/WEB-INF/components/banner.jsp" />

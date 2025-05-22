@@ -7,7 +7,6 @@
         <head>
             <title>All Appointments - MyDoctorApp</title>
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
             <style>
                 * {
                     margin: 0;
@@ -61,18 +60,24 @@
                     cursor: pointer;
                 }
 
-                /* Sidebar Styles */
+                /* Main Container */
                 .main-container {
                     display: flex;
                     flex: 1;
                 }
 
+                /* Sidebar Styles */
                 .sidebar {
                     width: 250px;
                     background-color: white;
                     border-right: 1px solid #e5e7eb;
                     min-height: calc(100vh - 70px);
                     padding-top: 20px;
+                    position: fixed;
+                    left: 0;
+                    top: 70px;
+                    bottom: 0;
+                    overflow-y: auto;
                 }
 
                 .sidebar-link {
@@ -83,6 +88,7 @@
                     color: #515151;
                     text-decoration: none;
                     cursor: pointer;
+                    white-space: nowrap;
                 }
 
                 .sidebar-link:hover {
@@ -103,28 +109,35 @@
                 .content-container {
                     flex: 1;
                     padding: 20px;
+                    margin-left: 250px;
                     max-width: calc(100vw - 250px);
                 }
 
-                .content-header {
-                    margin-bottom: 20px;
-                    font-size: 24px;
-                    font-weight: 500;
-                    color: #111827;
+                .appointments-container {
+                    width: 100%;
+                    max-width: 1200px;
+                    margin: 0 auto;
                 }
 
-                /* Appointments Table Styles */
+                .appointments-header {
+                    margin-bottom: 12px;
+                    font-size: 18px;
+                    font-weight: 500;
+                }
+
                 .appointments-table {
                     background: white;
-                    border-radius: 8px;
                     border: 1px solid #e5e7eb;
-                    overflow: hidden;
+                    border-radius: 8px;
+                    max-height: 80vh;
+                    min-height: 60vh;
+                    overflow-y: auto;
                 }
 
                 .table-header {
                     display: grid;
-                    grid-template-columns: 0.5fr 3fr 1fr 2fr 3fr 1fr 1fr;
-                    padding: 16px 24px;
+                    grid-template-columns: 0.5fr 3fr 1fr 3fr 3fr 1fr 1fr;
+                    padding: 12px 24px;
                     border-bottom: 1px solid #e5e7eb;
                     font-weight: 500;
                     color: #374151;
@@ -132,8 +145,8 @@
 
                 .appointment-row {
                     display: grid;
-                    grid-template-columns: 0.5fr 3fr 1fr 2fr 3fr 1fr 1fr;
-                    padding: 16px 24px;
+                    grid-template-columns: 0.5fr 3fr 1fr 3fr 3fr 1fr 1fr;
+                    padding: 12px 24px;
                     border-bottom: 1px solid #e5e7eb;
                     align-items: center;
                     color: #4b5563;
@@ -147,44 +160,26 @@
                 .doctor-info {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: 8px;
                 }
 
                 .profile-img {
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    background-color: #e5e7eb;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    overflow: hidden;
-                }
-
-                .profile-img img {
-                    width: 100%;
-                    height: 100%;
                     object-fit: cover;
-                }
-
-                .default-avatar {
-                    width: 20px;
-                    height: 20px;
-                    color: #9ca3af;
                 }
 
                 .cancelled {
                     color: #ef4444;
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: 500;
                 }
 
                 .cancel-icon {
-                    width: 32px;
-                    height: 32px;
+                    width: 40px;
+                    height: 40px;
                     cursor: pointer;
-                    color: #ef4444;
-                    padding: 4px;
                     transition: transform 0.2s ease;
                 }
 
@@ -192,22 +187,36 @@
                     transform: scale(1.1);
                 }
 
-                .rupee {
-                    font-family: system-ui;
+                .action-buttons {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
                 }
 
-                @media (max-width: 768px) {
-                    .content-container {
-                        padding: 10px;
-                    }
+                .pay-online-btn {
+                    padding: 8px 16px;
+                    background-color: #5C2D91;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background-color 0.2s;
+                }
 
+                .pay-online-btn:hover {
+                    background-color: #4A2474;
+                }
+
+                @media (max-width: 640px) {
                     .table-header {
                         display: none;
                     }
 
                     .appointment-row {
                         display: flex;
-                        flex-direction: column;
+                        flex-wrap: wrap;
                         gap: 8px;
                         padding: 12px;
                     }
@@ -216,82 +225,6 @@
                     .doctor-info {
                         width: 100%;
                     }
-                }
-
-                /* New Dynamic Features Styles */
-                .filters-container {
-                    background: white;
-                    padding: 20px;
-                    border-radius: 8px;
-                    margin-bottom: 20px;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                }
-
-                .search-box {
-                    width: 100%;
-                    padding: 8px 12px;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 4px;
-                    margin-bottom: 10px;
-                }
-
-                .filter-group {
-                    display: flex;
-                    gap: 15px;
-                    margin-bottom: 10px;
-                }
-
-                .filter-select {
-                    flex: 1;
-                    padding: 8px;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 4px;
-                }
-
-                .pagination {
-                    display: flex;
-                    justify-content: center;
-                    margin-top: 20px;
-                    gap: 5px;
-                }
-
-                .pagination button {
-                    padding: 8px 12px;
-                    border: 1px solid #e5e7eb;
-                    background: white;
-                    border-radius: 4px;
-                    cursor: pointer;
-                }
-
-                .pagination button.active {
-                    background: #20B2AA;
-                    color: white;
-                    border-color: #20B2AA;
-                }
-
-                .loading-overlay {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(255,255,255,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 1000;
-                }
-
-                .sort-header {
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 5px;
-                }
-
-                .sort-icon {
-                    width: 16px;
-                    height: 16px;
                 }
             </style>
         </head>
@@ -336,291 +269,223 @@
 
                 <!-- Content -->
                 <div class="content-container">
-                    <h1 class="content-header">All Appointments</h1>
+                    <div class="appointments-container">
+                        <p class="appointments-header">All Appointments</p>
 
-                    <!-- Filters Section -->
-                    <div class="filters-container">
-                        <input type="text" id="searchInput" class="search-box" placeholder="Search appointments...">
-                        <div class="filter-group">
-                            <select id="statusFilter" class="filter-select">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                            <select id="doctorFilter" class="filter-select">
-                                <option value="">All Doctors</option>
-                                <c:forEach items="${doctors}" var="doctor">
-                                    <option value="${doctor.id}">${doctor.name}</option>
-                                </c:forEach>
-                            </select>
-                            <select id="dateFilter" class="filter-select">
-                                <option value="">All Dates</option>
-                                <option value="today">Today</option>
-                                <option value="week">This Week</option>
-                                <option value="month">This Month</option>
-                            </select>
+                        <div class="appointments-table">
+                            <div class="table-header">
+                                <p>#</p>
+                                <p>Patient</p>
+                                <p>Age</p>
+                                <p>Date & Time</p>
+                                <p>Doctor</p>
+                                <p>Fees</p>
+                                <p>Action</p>
+                            </div>
+
+                            <c:forEach items="${appointments}" var="appointment" varStatus="status">
+                                <div class="appointment-row">
+                                    <p class="max-sm:hidden">${status.index + 1}</p>
+                                    <div class="patient-info">
+                                        <c:choose>
+                                            <c:when test="${not empty appointment.patientData.image}">
+                                                <img class="profile-img"
+                                                    src="data:image/jpeg;base64,${appointment.patientData.image}"
+                                                    alt="Patient">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img class="profile-img"
+                                                    src="${pageContext.request.contextPath}/assets/images/profile_pic.png"
+                                                    alt="Patient">
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <p>${appointment.patientData.name}</p>
+                                    </div>
+                                    <p class="max-sm:hidden">${appointment.patientData.age}</p>
+                                    <p>${appointment.slotDate}</p>
+                                    <div class="doctor-info">
+                                        <c:choose>
+                                            <c:when test="${not empty appointment.docData.image}">
+                                                <img class="profile-img"
+                                                    src="data:image/jpeg;base64,${appointment.docData.image}"
+                                                    alt="Doctor">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img class="profile-img"
+                                                    src="${pageContext.request.contextPath}/assets/images/default-doctor.png"
+                                                    alt="Doctor">
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <p>${appointment.docData.name}</p>
+                                    </div>
+                                    <p>₹1200</p>
+                                    <c:choose>
+                                        <c:when test="${appointment.cancelled}">
+                                            <p class="cancelled">Cancelled</p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="action-buttons">
+                                                <button type="button" class="pay-online-btn"
+                                                    data-appointment-id="${appointment.appointmentId}">Pay
+                                                    Online</button>
+                                                <img onclick="cancelAppointment('${appointment.appointmentId}')"
+                                                    class="cancel-icon"
+                                                    src="${pageContext.request.contextPath}/assets/images/cancel_icon.svg"
+                                                    alt="Cancel">
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </c:forEach>
                         </div>
                     </div>
-
-                    <div class="appointments-table">
-                        <div class="table-header">
-                            <div class="sort-header" data-sort="id"># <span class="sort-icon">↕</span></div>
-                            <div class="sort-header" data-sort="patient">Patient <span class="sort-icon">↕</span></div>
-                            <div class="sort-header" data-sort="age">Age <span class="sort-icon">↕</span></div>
-                            <div class="sort-header" data-sort="date">Date & Time <span class="sort-icon">↕</span></div>
-                            <div class="sort-header" data-sort="doctor">Doctor <span class="sort-icon">↕</span></div>
-                            <div class="sort-header" data-sort="fees">Fees <span class="sort-icon">↕</span></div>
-                            <div>Action</div>
-                        </div>
-
-                        <div id="appointmentsList">
-                            <!-- Appointments will be loaded dynamically here -->
-                        </div>
-                    </div>
-
-                    <div class="pagination" id="pagination">
-                        <!-- Pagination will be loaded dynamically here -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="loading-overlay" style="display: none;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
 
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
             <script>
-                let currentPage = 1;
-                let currentSort = { field: 'appointmentTime', direction: 'desc' };
-                let currentFilters = {};
+                // Khalti is initialized directly since the script is inline
+                // No longer needed for server-initiated flow
+                // let khaltiCheckout = null;
+                let khaltiInitialized = true; // Assume backend is ready to initiate
 
-                $(document).ready(function() {
-                    loadAppointments();
+                // Dynamic script loading is no longer needed
+                // function loadKhaltiScript() { ... }
 
-                    // Initialize filters
-                    $('.filter-select').on('change', function() {
-                        currentFilters[$(this).attr('id')] = $(this).val();
-                        loadAppointments();
-                    });
+                // Khalti is initialized directly since the script is inline
+                // No longer needed for server-initiated flow
+                // try {
+                //     khaltiCheckout = new KhaltiCheckout({ ... });
+                //      khaltiInitialized = true;
+                //      console.log('Khalti initialized successfully');
+                // } catch(error) { ... }
 
-                    // Initialize search
-                    $('#searchInput').on('input', debounce(function() {
-                        currentFilters.search = $(this).val();
-                        loadAppointments();
-                    }, 500));
-
-                    // Initialize sorting
-                    $('.sort-header').on('click', function() {
-                        const field = $(this).data('sort');
-                        if (currentSort.field === field) {
-                            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                        } else {
-                            currentSort.field = field;
-                            currentSort.direction = 'asc';
-                        }
-                        loadAppointments();
-                    });
-                });
-
-                function loadAppointments() {
-                    showLoading();
-                    
-                    const params = new URLSearchParams({
-                        page: currentPage,
-                        sortField: currentSort.field,
-                        sortDirection: currentSort.direction,
-                        ...currentFilters
-                    });
-
-                    fetch(`${pageContext.request.contextPath}/admin/appointments/data?${params}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Received appointments:', data);
-                            if (Array.isArray(data.appointments)) {
-                                renderAppointments(data.appointments);
-                                renderPagination(data.totalPages);
-                            } else {
-                                console.error('Invalid appointments data:', data);
-                                throw new Error('Invalid appointments data');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            $('#appointmentsList').html('<div class="error-message">Failed to load appointments. Please try again.</div>');
-                        })
-                        .finally(() => {
-                            hideLoading();
-                        });
-                }
-
-                function renderAppointments(appointments) {
-                    const container = $('#appointmentsList');
-                    container.empty();
-
-                    if (!appointments || appointments.length === 0) {
-                        container.html('<div class="no-appointments">No appointments found</div>');
+                function initiateKhaltiPayment(appointmentId, amount) {
+                    console.log('Entering initiateKhaltiPayment function', { appointmentId, amount });
+                    if (!khaltiInitialized) {
+                        alert('Payment system is not initialized. Please check for errors or contact support.');
                         return;
                     }
 
-                    appointments.forEach(appointment => {
-                        const row = `
-                            <div class="appointment-row">
-                                <div>${appointment.appointmentId}</div>
-                                <div class="patient-info">
-                                    <div class="profile-img">
-                                        <img src="${pageContext.request.contextPath}/assets/images/default-avatar.svg" alt="Patient">
-                                    </div>
-                                    <div>
-                                        <div class="name">${appointment.patientName || 'N/A'}</div>
-                                    </div>
-                                </div>
-                                <div>${appointment.patientAge || 'N/A'}</div>
-                                <div>${appointment.slotDate || 'N/A'}</div>
-                                <div class="doctor-info">
-                                    <div class="profile-img">
-                                        <img src="${appointment.docData && appointment.docData.image ? 'data:image/jpeg;base64,' + appointment.docData.image : pageContext.request.contextPath + '/assets/images/default-avatar.svg'}" alt="${appointment.docData && appointment.docData.name ? appointment.docData.name : 'Doctor'}">
-                                    </div>
-                                    <div>
-                                        <div class="name">${appointment.docData && appointment.docData.name ? appointment.docData.name : 'N/A'}</div>
-                                        <div class="speciality">${appointment.docData && appointment.docData.speciality ? appointment.docData.speciality : 'N/A'}</div>
-                                    </div>
-                                </div>
-                                <div>रू${appointment.payment || 0}</div>
-                                <div>
-                                    <select class="status-select" onchange="updateStatus(${appointment.appointmentId}, this.value)">
-                                        <option value="PENDING" ${appointment.status == 'PENDING' ? 'selected' : ''}>Pending</option>
-                                        <option value="CONFIRMED" ${appointment.status == 'CONFIRMED' ? 'selected' : ''}>Confirmed</option>
-                                        <option value="CANCELLED" ${appointment.status == 'CANCELLED' ? 'selected' : ''}>Cancelled</option>
-                                    </select>
-                                </div>
-                            </div>
-                        `;
-                        container.append(row);
-                    });
-                }
+                    console.log('Payment initiation requested for appointment:', appointmentId, 'amount:', amount);
 
-                function updateStatus(appointmentId, newStatus) {
-                    if (!confirm('Are you sure you want to update this appointment status?')) {
-                        return;
-                    }
-
-                    showLoading();
-                    fetch('${pageContext.request.contextPath}/admin/appointments', {
+                    // Call backend endpoint to initiate payment with Khalti
+                    fetch('${pageContext.request.contextPath}/admin/initiate-khalti-payment', { // **POINTING TO A NEW BACKEND ENDPOINT**
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: `appointmentId=${appointmentId}&status=${newStatus}`
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            loadAppointments();
-                        } else {
-                            alert('Failed to update appointment status');
-                            loadAppointments();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while updating the appointment status');
-                        loadAppointments();
-                    })
-                    .finally(() => {
-                        hideLoading();
-                    });
-                }
-
-                function renderPagination(totalPages) {
-                    const container = $('#pagination');
-                    container.empty();
-
-                    // Previous button
-                    const prevDisabled = currentPage === 1 ? 'disabled' : '';
-                    container.append(`
-                        <button onclick="changePage(${currentPage - 1})" ${prevDisabled}>
-                            Previous
-                        </button>
-                    `);
-
-                    // Page numbers
-                    for (let i = 1; i <= totalPages; i++) {
-                        const activeClass = i === currentPage ? 'active' : '';
-                        container.append(`
-                            <button onclick="changePage(${i})" class="${activeClass}">
-                                ${i}
-                            </button>
-                        `);
-                    }
-
-                    // Next button
-                    const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-                    container.append(`
-                        <button onclick="changePage(${currentPage + 1})" ${nextDisabled}>
-                            Next
-                        </button>
-                    `);
-                }
-
-                function changePage(page) {
-                    if (page >= 1 && page <= $('#pagination button').length - 2) {
-                        currentPage = page;
-                        loadAppointments();
-                    }
-                }
-
-                function showLoading() {
-                    $('.loading-overlay').show();
-                }
-
-                function hideLoading() {
-                    $('.loading-overlay').hide();
-                }
-
-                function debounce(func, wait) {
-                    let timeout;
-                    return function executedFunction(...args) {
-                        const later = () => {
-                            clearTimeout(timeout);
-                            func(...args);
-                        };
-                        clearTimeout(timeout);
-                        timeout = setTimeout(later, wait);
-                    };
-                }
-
-                function cancelAppointment(appointmentId) {
-                    if (confirm('Are you sure you want to cancel this appointment?')) {
-                        showLoading();
-                        fetch('${pageContext.request.contextPath}/admin/appointments', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: 'appointmentId=' + appointmentId
+                        body: new URLSearchParams({
+                            'appointmentId': appointmentId,
+                            'amount': amount * 100 // Amount in paisa
                         })
-                        .then(response => response.json())
+                    })
+                        .then(response => {
+                            console.log('Received response from backend initiate endpoint', response);
+                            if (!response.ok) {
+                                // Handle HTTP errors, e.g., 400, 500
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                                }).catch(() => {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
                         .then(data => {
-                            if (data.success) {
-                                loadAppointments();
+                            console.log('Payment initiation response from backend:', data);
+                            if (data.success && data.payment_url) {
+                                console.log('Redirecting to payment URL:', data.payment_url);
+                                // Redirect user to Khalti payment page
+                                window.location.href = data.payment_url;
                             } else {
-                                alert('Failed to cancel appointment');
+                                // Handle backend errors or missing payment_url
+                                throw new Error(data.message || 'Payment initiation failed: Invalid response from server.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error initiating payment:', error);
+                            alert('An error occurred while initiating payment: ' + error.message);
+                        });
+                }
+
+                // Add click handler to all pay online buttons
+                document.addEventListener('DOMContentLoaded', function () {
+                    console.log('DOMContentLoaded event fired. Attaching button listeners.');
+                    document.querySelectorAll('.pay-online-btn').forEach(button => {
+                        button.addEventListener('click', function (e) {
+                            console.log('Pay online button clicked.');
+                            e.preventDefault();
+                            const appointmentId = this.getAttribute('data-appointment-id');
+                            console.log('Calling initiateKhaltiPayment for appointment:', appointmentId);
+                            // Pass the amount dynamically if needed, currently hardcoded as 1200
+                            initiateKhaltiPayment(appointmentId, 1200);
+                        });
+                    });
+                });
+
+                // This function seems to handle payment verification after callback, which aligns with the documentation
+                function verifyPayment(token, paymentId) {
+                    console.log('Entering verifyPayment function', { token, paymentId });
+                    fetch('${pageContext.request.contextPath}/payment/verify', { // **ENSURE THIS ENDPOINT HANDLES KHALTI CALLBACK AND VERIFICATION**
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'token': token,
+                            'paymentId': paymentId
+                        })
+                    })
+                        .then(response => {
+                            console.log('Received response from verify endpoint', response);
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                                }).catch(() => {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Payment verification data:', data);
+                            if (data.success) {
+                                alert('Payment successful!');
+                                location.reload();
+                            } else {
+                                throw new Error(data.message || 'Payment verification failed');
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
-                            alert('An error occurred while cancelling the appointment');
-                        })
-                        .finally(() => {
-                            hideLoading();
+                            alert('Payment verification failed: ' + error.message);
+                        });
+                }
+
+                // Keep existing cancel appointment logic
+                function cancelAppointment(appointmentId) {
+                    console.log('Attempting to cancel appointment', appointmentId);
+                    if (confirm('Are you sure you want to cancel this appointment?')) {
+                        $.ajax({
+                            url: '${pageContext.request.contextPath}/admin/appointments',
+                            method: 'POST',
+                            data: {
+                                appointmentId: appointmentId
+                            },
+                            success: function (response) {
+                                console.log('Cancel appointment response', response);
+                                if (response.success) {
+                                    location.reload();
+                                } else {
+                                    alert('Failed to cancel appointment');
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Cancel appointment AJAX error', status, error);
+                                alert('An error occurred while cancelling the appointment');
+                            }
                         });
                     }
                 }

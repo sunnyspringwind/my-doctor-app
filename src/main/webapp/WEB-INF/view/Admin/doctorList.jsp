@@ -173,6 +173,39 @@
                         cursor: pointer;
                     }
 
+                    .action-buttons {
+                        display: flex;
+                        gap: 8px;
+                        margin-top: 12px;
+                    }
+
+                    .edit-button, .delete-button {
+                        padding: 6px 12px;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                        transition: all 0.3s ease;
+                    }
+
+                    .edit-button {
+                        background-color: #20B2AA;
+                        color: white;
+                    }
+
+                    .delete-button {
+                        background-color: #ff4444;
+                        color: white;
+                    }
+
+                    .edit-button:hover {
+                        background-color: #1a9c96;
+                    }
+
+                    .delete-button:hover {
+                        background-color: #ff0000;
+                    }
+
                     /* Hide scrollbar for Chrome, Safari and Opera */
                     .content-container::-webkit-scrollbar {
                         display: none;
@@ -183,10 +216,97 @@
                         -ms-overflow-style: none;
                         scrollbar-width: none;
                     }
+
+                    /* Modal Styles */
+                    .modal-overlay {
+                        display: none;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        z-index: 1000;
+                        justify-content: center;
+                        align-items: center;
+                    }
+
+                    .modal-content {
+                        background-color: white;
+                        padding: 30px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        max-width: 400px;
+                        width: 90%;
+                        text-align: center;
+                    }
+
+                    .modal-title {
+                        font-size: 1.25rem;
+                        font-weight: 600;
+                        color: #1F2937;
+                        margin-bottom: 15px;
+                    }
+
+                    .modal-message {
+                        color: #4B5563;
+                        margin-bottom: 25px;
+                        line-height: 1.5;
+                    }
+
+                    .modal-buttons {
+                        display: flex;
+                        justify-content: center;
+                        gap: 12px;
+                    }
+
+                    .modal-button {
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                        font-weight: 500;
+                        transition: all 0.3s ease;
+                    }
+
+                    .modal-button.confirm {
+                        background-color: #EF4444;
+                        color: white;
+                    }
+
+                    .modal-button.confirm:hover {
+                        background-color: #dc2626;
+                    }
+
+                    .modal-button.cancel {
+                        background-color: #E5E7EB;
+                        color: #4B5563;
+                    }
+
+                    .modal-button.cancel:hover {
+                        background-color: #D1D5DB;
+                    }
+
+                    .doctor-name {
+                        font-weight: 600;
+                    }
                 </style>
             </head>
 
             <body>
+                <!-- Delete Confirmation Modal -->
+                <div id="deleteModal" class="modal-overlay">
+                    <div class="modal-content">
+                        <h2 class="modal-title">Delete Doctor</h2>
+                        <p class="modal-message">Are you sure you want to delete <span class="doctor-name" id="doctorName"></span>? This action cannot be undone.</p>
+                        <div class="modal-buttons">
+                            <button class="modal-button cancel" onclick="closeDeleteModal()">Cancel</button>
+                            <button class="modal-button confirm" onclick="confirmDelete()">Delete</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Navbar -->
                 <nav class="admin-navbar">
                     <div class="admin-navbar-left">
@@ -255,6 +375,10 @@
                                                 test="${doctor.available}">checked</c:if>>
                                             <label for="available-${doctor.doctorId}">Available</label>
                                         </div>
+                                        <div class="action-buttons">
+                                            <button class="edit-button" onclick="editDoctor('${doctor.doctorId}')">Edit</button>
+                                            <button class="delete-button" onclick="showDeleteModal('${doctor.doctorId}', '${doctor.name}')">Delete</button>
+                                        </div>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -263,6 +387,50 @@
                 </div>
 
                 <script>
+                    let doctorToDelete = null;
+
+                    function showDeleteModal(doctorId, doctorName) {
+                        doctorToDelete = doctorId;
+                        document.getElementById('doctorName').textContent = doctorName;
+                        document.getElementById('deleteModal').style.display = 'flex';
+                    }
+
+                    function closeDeleteModal() {
+                        document.getElementById('deleteModal').style.display = 'none';
+                        doctorToDelete = null;
+                    }
+
+                    function confirmDelete() {
+                        if (!doctorToDelete) return;
+
+                        fetch('${pageContext.request.contextPath}/admin/delete-doctor', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                doctorId: doctorToDelete
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Remove the doctor card from the UI
+                                const doctorCard = document.querySelector(`[data-doctor-id="${doctorToDelete}"]`);
+                                if (doctorCard) {
+                                    doctorCard.remove();
+                                }
+                                closeDeleteModal();
+                            } else {
+                                alert('Failed to delete doctor: ' + (data.error || 'Unknown error'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the doctor');
+                        });
+                    }
+
                     function changeAvailability(doctorId) {
                         fetch('${pageContext.request.contextPath}/admin/change-availability', {
                             method: 'POST',
@@ -276,16 +444,18 @@
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    // Handle success
                                     console.log('Availability updated successfully');
                                 } else {
-                                    // Handle error
                                     console.error('Failed to update availability');
                                 }
                             })
                             .catch(error => {
                                 console.error('Error:', error);
                             });
+                    }
+
+                    function editDoctor(doctorId) {
+                        window.location.href = '${pageContext.request.contextPath}/admin/edit-doctor?id=' + doctorId;
                     }
                 </script>
             </body>

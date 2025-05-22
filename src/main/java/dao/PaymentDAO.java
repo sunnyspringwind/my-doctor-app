@@ -101,6 +101,25 @@ public class PaymentDAO implements IPaymentDAO {
         return null;
     }
 
+    public boolean updatePayment(Payment payment) {
+        String sql = "UPDATE Payment SET status = ?, transactionId = ? WHERE appointmentId = ?";
+        
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, payment.getStatus().name());
+            ps.setString(2, payment.getTransactionId());
+            ps.setInt(3, payment.getAppointmentId());
+            
+            int rows = ps.executeUpdate();
+            return rows > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
 
 

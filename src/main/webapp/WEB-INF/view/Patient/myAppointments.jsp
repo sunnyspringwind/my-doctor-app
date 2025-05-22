@@ -378,6 +378,50 @@
                             }
                         });
                     });
+
+                    // Function to handle payment initiation
+                    function initiatePayment(appointmentId) {
+                        console.log('Initiating payment for appointment:', appointmentId);
+                        
+                        // Call backend endpoint to initiate payment
+                        fetch('${pageContext.request.contextPath}/initiate-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                'appointmentId': appointmentId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success && data.payment_url) {
+                                // Redirect to payment URL
+                                window.location.href = data.payment_url;
+                            } else {
+                                throw new Error(data.message || 'Failed to initiate payment');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Failed to initiate payment: ' + error.message);
+                        });
+                    }
+
+                    // Add click handlers to all Pay Online buttons
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.querySelectorAll('.pay-online-btn').forEach(button => {
+                            button.addEventListener('click', function() {
+                                const appointmentId = this.closest('.appointment-card').getAttribute('data-appointment-id');
+                                initiatePayment(appointmentId);
+                            });
+                        });
+                    });
                 </script>
             </head>
 
@@ -425,6 +469,11 @@
                                                 <c:when test="${appointment.status eq 'CONFIRMED'}">
                                                     <div class="appointment-cancelled" style="background-color: #d1fae5; color: #10b981; border: 1px solid #a7f3d0;">
                                                         Confirmed
+                                                    </div>
+                                                </c:when>
+                                                <c:when test="${appointment.status eq 'PAID'}">
+                                                    <div class="appointment-cancelled" style="background-color: #d1fae5; color: #10b981; border: 1px solid #a7f3d0;">
+                                                        Paid
                                                     </div>
                                                 </c:when>
                                                 <c:otherwise>

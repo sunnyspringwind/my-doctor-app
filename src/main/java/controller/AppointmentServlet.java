@@ -203,6 +203,7 @@ public class AppointmentServlet extends HttpServlet {
             // Get patient from session
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("user") == null) {
+                System.out.println("No user session found, redirecting to login");
                 response.sendRedirect(request.getContextPath() + "/login");
                 return;
             }
@@ -216,6 +217,12 @@ public class AppointmentServlet extends HttpServlet {
             
             System.out.println("Creating new appointment for patient ID: " + patient.getPatientId());
             
+            // Log all request parameters
+            System.out.println("Request parameters:");
+            request.getParameterMap().forEach((key, value) -> {
+                System.out.println(key + ": " + String.join(", ", value));
+            });
+            
             Appointment appointment = new Appointment();
             appointment.setDoctorId(request.getParameter("doctorId"));
             appointment.setPatientId(patient.getPatientId().toString());
@@ -224,7 +231,13 @@ public class AppointmentServlet extends HttpServlet {
             appointment.setReason(request.getParameter("reason"));
             appointment.setPayment(Float.parseFloat(request.getParameter("payment")));
 
-            System.out.println("Appointment details: " + appointment.toString());
+            System.out.println("Appointment details:");
+            System.out.println("Doctor ID: " + appointment.getDoctorId());
+            System.out.println("Patient ID: " + appointment.getPatientId());
+            System.out.println("Appointment Time: " + appointment.getAppointmentTime());
+            System.out.println("Status: " + appointment.getStatus());
+            System.out.println("Reason: " + appointment.getReason());
+            System.out.println("Payment: " + appointment.getPayment());
 
             StatusCode status = appointmentService.addAppointment(appointment);
             System.out.println("Appointment creation status: " + status);
@@ -238,7 +251,7 @@ public class AppointmentServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/view/Patient/appointment.jsp").forward(request, response);
             }
         } catch (Exception e) {
-            System.out.println("Error creating appointment: " + e.getMessage());
+            System.err.println("Error creating appointment: " + e.getMessage());
             e.printStackTrace();
             request.setAttribute("error", "Error creating appointment: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/view/Patient/appointment.jsp").forward(request, response);

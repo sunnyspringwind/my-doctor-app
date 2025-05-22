@@ -6,6 +6,7 @@ public class DashboardStats {
     private int totalDoctors;
     private int totalAppointments;
     private int totalPatients;
+    private float totalEarnings;
     private List<Booking> latestBookings;
 
     // Getters and Setters
@@ -31,6 +32,14 @@ public class DashboardStats {
 
     public void setTotalPatients(int totalPatients) {
         this.totalPatients = totalPatients;
+    }
+
+    public float getTotalEarnings() {
+        return totalEarnings;
+    }
+
+    public void setTotalEarnings(float totalEarnings) {
+        this.totalEarnings = totalEarnings;
     }
 
     public List<Booking> getLatestBookings() {

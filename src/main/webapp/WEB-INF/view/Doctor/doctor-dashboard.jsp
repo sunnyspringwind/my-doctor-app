@@ -7,6 +7,8 @@
         <head>
             <title>Doctor Dashboard - MyDoctorApp</title>
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
                 * {
                     margin: 0;
                     padding: 0;
@@ -256,20 +258,20 @@
             <div class="main-container">
                 <!-- Sidebar -->
                 <div class="sidebar">
-                    <a href="${pageContext.request.contextPath}/admin/dashboard"
+                    <a href="${pageContext.request.contextPath}/doctor/dashboard"
                         class="sidebar-link ${currentPage eq 'dashboard' ? 'active' : ''}">
                         <img src="${pageContext.request.contextPath}/assets/images/home_icon.svg" alt=""
                             class="sidebar-icon">
                         <span>Dashboard</span>
                     </a>
-                    <a href="${pageContext.request.contextPath}/admin/appointments"
+                    <a href="${pageContext.request.contextPath}/doctor/appointments"
                         class="sidebar-link ${currentPage eq 'appointments' ? 'active' : ''}">
                         <img src="${pageContext.request.contextPath}/assets/images/appointment_icon.svg" alt=""
                             class="sidebar-icon">
                         <span>Appointments</span>
                     </a>
-                    <a href="${pageContext.request.contextPath}/admin/doctor-list"
-                        class="sidebar-link ${currentPage eq 'doctor-list' ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/doctor/profile"
+                        class="sidebar-link ${currentPage eq 'profile' ? 'active' : ''}">
                         <img src="${pageContext.request.contextPath}/assets/images/people_icon.svg" alt=""
                             class="sidebar-icon">
                         <span>Profile</span>
@@ -279,16 +281,16 @@
                 <!-- Dashboard Content -->
                 <div class="content-container">
                     <div class="dashboard-header">
-                        
+                        <h1>Doctor Dashboard</h1>
                     </div>
 
                     <!-- Statistics Cards -->
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <img src="${pageContext.request.contextPath}/assets/images/earnings_icon.svg" alt=""
+                            <img src="${pageContext.request.contextPath}/assets/images/earning_icon.svg" alt=""
                                 class="stat-icon">
                             <div class="stat-info">
-                                <span class="stat-number">${dashboardStats.totalEarnings}</span>
+                                <span class="stat-number">₹${dashboardStats.totalEarnings}</span>
                                 <span class="stat-label">Earnings</span>
                             </div>
                         </div>
@@ -314,22 +316,23 @@
                     <div class="bookings-section">
                         <div class="bookings-header">
                             <img src="${pageContext.request.contextPath}/assets/images/list_icon.svg" alt="">
-                            <p>Latest Bookings</p>
+                            <p>Latest Appointments</p>
                         </div>
                         <div class="bookings-list">
                             <c:forEach items="${dashboardStats.latestBookings}" var="booking">
                                 <div class="booking-item">
                                     <c:choose>
                                         <c:when test="${not empty booking.doctorImage}">
-                                            <img loading="lazy" src="data:image/jpeg;base64,${booking.doctorImage}" alt="Doctor" class="doctor-image">
+                                            <img loading="lazy" src="data:image/jpeg;base64,${booking.doctorImage}" alt="Patient" class="doctor-image">
                                         </c:when>
                                         <c:otherwise>
-                                            <img loading="lazy" src="${pageContext.request.contextPath}/assets/images/default-doctor.png" alt="Doctor" class="doctor-image">
+                                            <img loading="lazy" src="${pageContext.request.contextPath}/assets/images/default-doctor.png" alt="Patient" class="doctor-image">
                                         </c:otherwise>
                                     </c:choose>
                                     <div class="booking-info">
                                         <p class="doctor-name">${booking.doctorName}</p>
                                         <p class="booking-date">${booking.date}</p>
+                                        <p class="booking-payment">₹${booking.payment}</p>
                                     </div>
                                     <c:choose>
                                         <c:when test="${booking.status eq 'CANCELLED'}">
@@ -340,14 +343,14 @@
                                         </c:when>
                                         <c:when test="${booking.status eq 'PENDING'}">
                                             <div style="display: flex; gap: 16px; align-items: center;">
-                                                <form method="post" action="${pageContext.request.contextPath}/admin/booking-action" style="display:inline;">
+                                                <form method="post" action="${pageContext.request.contextPath}/doctor/appointment-action" style="display:inline;">
                                                     <input type="hidden" name="appointmentId" value="${booking.id}" />
                                                     <input type="hidden" name="action" value="accept" />
                                                     <button type="submit" title="Accept" style="background:none;border:none;cursor:pointer;">
                                                         <img src="${pageContext.request.contextPath}/assets/images/tick_icon.svg" alt="Accept" style="width:28px;height:28px;"/>
                                                     </button>
                                                 </form>
-                                                <form method="post" action="${pageContext.request.contextPath}/admin/booking-action" style="display:inline;">
+                                                <form method="post" action="${pageContext.request.contextPath}/doctor/appointment-action" style="display:inline;">
                                                     <input type="hidden" name="appointmentId" value="${booking.id}" />
                                                     <input type="hidden" name="action" value="cancel" />
                                                     <button type="submit" title="Cancel" style="background:none;border:none;cursor:pointer;">

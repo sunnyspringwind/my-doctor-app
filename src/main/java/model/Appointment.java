@@ -5,18 +5,20 @@ import java.sql.Timestamp;
 public class Appointment {
     private String id;
     private DoctorData docData;
+    private PatientData patientData;
     private String slotDate;
     private boolean cancelled;
     private int appointmentId;
     private String doctorId;
     private String patientId;
-    private String patientName;
-    private int patientAge;
     private float fees;
     private Timestamp appointmentTime;
     private String status;
     private String reason;
     private float payment;
+    private String paymentMode;
+    private float amount;
+    private boolean completed;
 
     // Default constructor and custom ones
     public Appointment() {}
@@ -55,6 +57,14 @@ public class Appointment {
 
     public void setDocData(DoctorData docData) {
         this.docData = docData;
+    }
+
+    public PatientData getPatientData() {
+        return patientData;
+    }
+
+    public void setPatientData(PatientData patientData) {
+        this.patientData = patientData;
     }
 
     public String getSlotDate() {
@@ -97,22 +107,6 @@ public class Appointment {
         this.patientId = patientId;
     }
 
-    public String getPatientName() {
-        return patientName;
-    }
-
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    public int getPatientAge() {
-        return patientAge;
-    }
-
-    public void setPatientAge(int patientAge) {
-        this.patientAge = patientAge;
-    }
-
     public float getFees() {
         return fees;
     }
@@ -151,5 +145,29 @@ public class Appointment {
 
     public void setPayment(float payment) {
         this.payment = payment;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
+    }
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

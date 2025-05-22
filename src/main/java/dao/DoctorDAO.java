@@ -258,7 +258,16 @@ public class DoctorDAO implements IDoctorDAO {
         doctor.setFees(rs.getFloat("fees"));
         doctor.setDegree(rs.getString("degree"));
         doctor.setAvailable(rs.getBoolean("isAvailable"));
-        doctor.setPfp(rs.getBytes("pfp"));
+        byte[] pfpBytes = rs.getBytes("pfp"); // Retrieve bytes
+        doctor.setPfp(pfpBytes); // Set bytes on the Doctor object
+
+        // Add printout here to check if pfpBytes is populated
+        if (pfpBytes != null && pfpBytes.length > 0) {
+            System.out.println("DoctorDAO: PFP byte array length in createDoctorFromResultSet: " + pfpBytes.length);
+        } else {
+            System.out.println("DoctorDAO: PFP byte array is NULL or EMPTY in createDoctorFromResultSet.");
+        }
+
         doctor.setAddress(rs.getString("address"));
         doctor.setAbout(rs.getString("about"));
         System.out.println("DoctorDAO: Created Doctor object: " + doctor.toString());

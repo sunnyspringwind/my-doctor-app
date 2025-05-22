@@ -7,6 +7,8 @@
         <head>
             <title>Admin Dashboard - MyDoctorApp</title>
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
                 * {
                     margin: 0;
                     padding: 0;

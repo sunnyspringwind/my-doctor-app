@@ -654,6 +654,10 @@
                             const selectedDayIndex = document.querySelector('input[name="selectedDayIndex"]').value;
                             const selectedTime = document.querySelector('input[name="selectedTime"]').value;
 
+                            console.log('Starting appointment booking process...');
+                            console.log('Selected Day Index:', selectedDayIndex);
+                            console.log('Selected Time:', selectedTime);
+
                             // Create appointment data
                             const appointmentData = {
                                 action: 'create',
@@ -665,6 +669,8 @@
                                 payment: parseFloat('${doctor.fees}')
                             };
 
+                            console.log('Appointment Data:', appointmentData);
+
                             // Send POST request to save appointment
                             fetch('${pageContext.request.contextPath}/appointment', {
                                 method: 'POST',
@@ -674,17 +680,21 @@
                                 body: new URLSearchParams(appointmentData)
                             })
                                 .then(response => {
+                                console.log('Server Response Status:', response.status);
+                                return response.text().then(text => {
+                                    console.log('Server Response Text:', text);
                                     if (response.ok) {
                                         // Close the modal and redirect to my-appointments
                                         closeModal();
                                         window.location.href = '${pageContext.request.contextPath}/my-appointments?success=true';
                                     } else {
-                                        throw new Error('Failed to book appointment');
+                                        throw new Error('Failed to book appointment: ' + text);
                                     }
+                                });
                                 })
                                 .catch(error => {
                                     console.error('Error booking appointment:', error);
-                                    alert('Failed to book appointment. Please try again.');
+                                alert('Failed to book appointment: ' + error.message);
                                 });
                         }
 

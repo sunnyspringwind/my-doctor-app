@@ -7,6 +7,7 @@ public class Booking {
     private String date;
     private String status;
     private boolean cancelled;
+    private float payment;
 
     // Getters and Setters
     public int getId() {
@@ -55,5 +56,13 @@ public class Booking {
 
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
+    }
+
+    public float getPayment() {
+        return payment;
+    }
+
+    public void setPayment(float payment) {
+        this.payment = payment;
     }
 } 
